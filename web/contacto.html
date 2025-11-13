@@ -5,24 +5,25 @@
     <title>Formularios</title>
 </head>
 <body>
-<form action=" https://lm.ciclo.iesnervion.es/form3/envio.php" method="get">
+<form action=" https://lm.ciclo.iesnervion.es/form3/envio.php" method="get" enctype="multipart/form-data">
     <fieldset>
-        <!-- titulo formulario-->
+        
         <legend>Información de contacto</legend>
-        <!-- Recoge el nombre-->
+       
         <label for="name">Nombre:</label>
-        <input type="text" id="name"><br>
-        <!-- Recoge el email-->
+        <input type="text" id="name" name="nombre"><br>
+       
         <label for="email">Email:</label>
-        <input type="email" id="email"><br>
-          <!-- Recoge la imagen-->
+        <input type="email" id="email" name="correo"><br>
+       
         <label for="image">Imagen:</label>
-        <input type="image" id="imagen"><br>
-        <!-- Recoge el mensaje-->
+        <input type="file" id="imagen" name="imagen"><br>
+       
         <label for="message">Mensaje:</label>
-        <textarea id="message"></textarea>
+        <textarea id="message" name="mensaje"></textarea>
     </fieldset>
     <button>Enviar</button>
 </form>
+<h3><a href="index.html"target="_self">Volver</a></h3>
 </body>
 </html>

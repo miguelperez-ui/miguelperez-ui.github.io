@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+    <header>
+        <h1>CodeFest 2025</h1>
+        <h2>Donde la Música y el Código se encuentran</h2>
+    </header>
+    <nav>
+        <ul>
+            <a href="../../CodeFest/index.html"target="_self">Inicio</a>
+        </ul>
+         <ul>
+            <a href="../web/cartel.html"target="_self">Cartel</a>
+        </ul>
+        <ul>
+            <a href="../web/localizacion.html"target="_self">localización</a>
+        </ul>
+         <ul>
+            <a href="../web/entradas.html"target="_self">Entradas</a>
+        </ul>
+    </nav>
+    <main>
+       <form action="https://www.w3schools.com/action_page.php" method="get" enctype="multipart/form-data">
+    <fieldset>
+        
+        <legend>"Datos Personales</legend>
+       
+        <label for="name">Nombre:</label>
+        <input type="text" placeholder="Nombre y Apellidos"><br>
+       
+        <label for="email">Email:</label>
+        <input type="email" required>
+       
+       
+    </fieldset>
+    <fieldset>
+
+        <legend>Tipo de entrada</legend>
+
+        <label>Abono General (3 Días)</label>
+        <input type="radio" name="tipo_entrada">
+
+        <label>Abono VIP (3 Días)</label>
+        <input type="radio" name="tipo_entrada">
+
+        <label>Entrada de Día</label>
+        <input type="radio" name="tipo_entrada">
+
+    </fieldset>
+    <fieldset>
+
+        <legend>Extras</legend>
+    
+        <label>Camping</label>
+        <input type="checkbox">
+
+        <label>Pack Merchandising</label>
+        <input type="checkbox">
+
+        <label>Acceso a Talleres Tech</label>
+        <input type="checkbox">
+
+    </fieldset>
+    <fieldset>
+
+        <legend>Día (Solo si es Entrada de Día)</legend>
+
+        <select>
+            <option>Viernes</option>
+            <option>Sábado</option>
+            <option>Domingo</option>
+        </select>
+
+    </fieldset>
+    <button type="submit">Enviar</button>
+</form>
+    </main>
+    <footer><p>© 2025 CodeFest. Todos los derechos reservados.</p></footer>
