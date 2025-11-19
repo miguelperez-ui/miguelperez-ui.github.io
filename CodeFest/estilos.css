@@ -1,0 +1,204 @@
+/* --- CONFIGURACIÓN GLOBAL --- */
+* {
+    /* Esto hace que el padding y el borde no añadan ancho extra a las cajas */
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Arial', sans-serif; /* Una fuente limpia y moderna */
+    line-height: 1.6;
+    background-color: #1a1a1a; /* Fondo oscuro (casi negro) */
+    color: #f4f4f4; /* Texto principal claro (casi blanco) */
+    margin: 0;
+}
+
+/* --- ESTRUCTURA SEMÁNTICA (LAYOUT) --- */
+/* Centramos todo el contenido en un ancho máximo */
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: auto; /* Centrado automático */
+}
+
+/* --- CABECERA Y PIE DE PÁGINA --- */
+header {
+    background: #111; /* Un poco más negro que el fondo */
+    padding: 20px 0;
+    text-align: center;
+    border-bottom: 3px solid #ffb700; /* Color acento "CodeFest" */
+}
+
+header h1 {
+    color: #ffb700; /* Color acento */
+    margin-bottom: 5px;
+}
+
+header h2 {
+    color: #ccc;
+    font-size: 1.1em;
+    font-style: italic;
+}
+
+footer {
+    text-align: center;
+    padding: 30px 0;
+    margin-top: 30px;
+    font-size: 0.9em;
+    color: #777;
+    border-top: 1px solid #333;
+}
+
+/* --- BARRA DE NAVEGACIÓN (Ejercicio 1) --- */
+nav {
+    background: #333; /* Gris oscuro para la barra de nav */
+    padding: 15px 0;
+    position: sticky; /* ¡Efecto extra! El menú se queda fijo arriba */
+    top: 0;
+    z-index: 100;
+}
+
+nav ul {
+    list-style-type: none; /* Quitamos las viñetas */
+    text-align: center;
+}
+
+nav ul li {
+    display: inline-block; /* ¡Magia! Pone los elementos en línea */
+    margin: 0 20px; /* Espacio entre cada elemento del menú */
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none; /* Quitamos el subrayado */
+    font-weight: bold;
+    font-size: 1.1em;
+    transition: color 0.3s ease; /* Transición suave de color */
+}
+
+nav ul li a:hover {
+    color: #ffb700; /* Cambia al color acento al pasar el ratón */
+}
+
+/* --- CONTENIDO PRINCIPAL Y MULTIMEDIA --- */
+main {
+    padding: 30px 0;
+}
+
+/* Títulos de sección */
+h2, h3 {
+    color: #ffb700;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #444;
+    padding-bottom: 5px;
+}
+
+/* Hacemos que imágenes y vídeos sean "responsive" */
+img, iframe, video, audio {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px; /* Bordes redondeados sutiles */
+    margin-top: 10px;
+}
+
+/* --- TABLAS (Ejercicio 3: Cartel) --- */
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse; /* Bordes de celda unidos, aspecto limpio */
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #555; /* Bordes grises oscuros */
+    text-align: left;
+}
+
+thead, tfoot {
+    background-color: #333; /* Fondo oscuro para cabecera y pie de tabla */
+    color: #ffb700;
+    font-size: 1.1em;
+    text-align: center;
+}
+
+/* Efecto cebra: filas pares con un fondo ligeramente diferente */
+tbody tr:nth-child(even) {
+    background-color: #2a2a2a;
+}
+
+/* Estilo para las celdas combinadas */
+td[colspan], td[rowspan] {
+    background-color: #4a4a4a;
+    text-align: center;
+    font-weight: bold;
+    color: #fff;
+}
+
+/* --- FORMULARIOS (Ejercicio 2: Entradas) --- */
+form {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #222;
+    border-radius: 8px;
+}
+
+fieldset {
+    border: 2px solid #555;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+legend {
+    font-weight: bold;
+    font-size: 1.3em;
+    color: #ffb700;
+    padding: 0 10px; /* Espacio para que "flote" sobre el borde */
+}
+
+label {
+    display: block; /* La etiqueta ocupa su propia línea */
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+/* Estilo para inputs de texto, email y select */
+input[type="text"],
+input[type="email"],
+select,
+textarea {
+    width: 100%; /* Ocupan todo el ancho disponible */
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: #333;
+    color: #fff;
+    font-size: 1em;
+}
+
+/* Estilo para radios y checkboxes (un poco más sutil) */
+input[type="radio"],
+input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+button[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background-color: #ffb700; /* Color acento */
+    color: #111; /* Texto oscuro para contraste */
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer; /* Manito al pasar */
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #fff; /* Cambio drástico al pasar el ratón */
+}
