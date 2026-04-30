@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Variables y Operaciones</title>
+</head>
+<body>
+    
+    <div id="presentacion" class="caja-resultado"></div>
+    <div id="calculos" class="caja-resultado"></div>
+
+    <script>
+        // --- 1. Declarar variable con nombre y edad ---
+        let nombre = "Juan"; 
+        let edad = 30;      
+
+        // Mostrar el mensaje en el primer contenedor HTML
+        let textoPresentacion = `Mi nombre es ${nombre} y tengo ${edad} años.`;
+        document.getElementById("presentacion").innerHTML = textoPresentacion;
+
+        // --- 2. Declarar dos números y calcular ---
+        let numeroA = 20;
+        let numeroB = 5;
+
+        // Operaciones
+        let suma = numeroA + numeroB;
+        let diferencia = numeroA - numeroB;
+        let producto = numeroA * numeroB;
+        let cociente = numeroA / numeroB;
+
+        // Mostrar los resultados en el segundo contenedor HTML
+        let textoCalculos = `
+            <strong>Números elegidos:</strong> ${numeroA} y ${numeroB} <br><br>
+            <strong>Suma:</strong> ${suma} <br>
+            <strong>Diferencia:</strong> ${diferencia} <br>
+            <strong>Producto:</strong> ${producto} <br>
+            <strong>Cociente:</strong> ${cociente}
+        `;
+        document.getElementById("calculos").innerHTML = textoCalculos;
+    </script>
+
+</body>
+</html>

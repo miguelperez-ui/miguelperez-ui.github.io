@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Ejercicio2</title>
+    </head>
+    <body>
+    
+        <div class="formulario">
+        <div class="campo">
+            <label for="inputParImpar">Dime un número:</label>
+            <input type="number" id="inputParImpar"ººº>
+        </div>
+        <div class="campo">
+            <label for="inputEdad">Dime tu edad:</label>
+            <input type="number" id="inputEdad">
+        </div>
+       
+        <button onclick="uno()">Mostrar Resultados</button>
+
+
+        <script>
+
+            function uno() {
+                const parImpar = document.getElementById("inputParImpar");
+
+                if(parImpar%2==0){   
+                    parImpar.textContent = "El número ";
+
+                }else{
+                    <strong>El número ${parImpar} es impar.</strong>
+                }
+            }
+
+        </script>
+
+
+
+
+
+    </body>
+
+</html>
