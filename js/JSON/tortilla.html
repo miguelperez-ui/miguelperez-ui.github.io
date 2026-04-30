@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taberna & Motors S.A. | Lomo Flipping Edition</title>
+    <style>
+        :root {
+            --bg: #f0f2f5; --card: #ffffff; --text: #1a1a1a;
+            --primary: #2c3e50; --accent: #d9534f; --gold: #f1c40f;
+            --bread: #dfb35d; --success: #27ae60;
+        }
+        body.dark-mode {
+            --bg: #121212; --card: #1e1e1e; --text: #e0e0e0;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; padding: 20px; transition: 0.3s; margin: 0; }
+        .container { width: 100%; max-width: 900px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .panel { background: var(--card); padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        h2 { margin-top: 0; border-bottom: 2px solid var(--gold); padding-bottom: 10px; font-size: 1.2rem; }
+
+        /* Común UI */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin: 15px 0; }
+        .card { border: 2px solid #eee; padding: 10px; border-radius: 10px; cursor: pointer; text-align: center; position: relative; transition: 0.2s; background: var(--card); }
+        .card:hover { transform: translateY(-3px); }
+        .card.active { border-color: var(--accent); background: rgba(217, 83, 79, 0.1); }
+        .stock-tag { position: absolute; top: -5px; right: -5px; background: #333; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; }
+
+        /* ========================================= */
+        /* ZONA DE PREPARACIÓN VISUAL (LOMO GIRATORIO) */
+        /* ========================================= */
+        .preview-box { 
+            height: 120px; background: #fafafa; border-radius: 10px; margin: 10px 0; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 2.5rem; border: 1px inset #eee; position: relative;
+            overflow: hidden; /* Para que no se salga al dar vueltas */
+        }
+        
+        body.dark-mode .preview-box { background: #2a2a2a; border-color: #444; }
+
+        /* Estilo base del lomo */
+        .lomo-vv { 
+            width: 120px; height: 25px; 
+            background: #ff7f50; /* Color carne */
+            border-bottom: 4px solid #d35400; /* Tostado */
+            border-radius: 8px;
+            position: relative;
+            transform-origin: center center; /* Gira sobre su eje central */
+        }
+
+        /* --- LA ANIMACIÓN SOLICITADA --- */
+        @keyframes voltereta-lomo {
+            0% { transform: rotate(0deg) scaleY(1); }
+            25% { transform: rotate(90deg) scaleY(0.5); background: #ff7f50; }
+            50% { transform: rotate(180deg) scaleY(1); background: #e06c43; /* Un poco más hecho por el otro lado */ }
+            75% { transform: rotate(270deg) scaleY(0.5); background: #e06c43; }
+            100% { transform: rotate(360deg) scaleY(1); background: #ff7f50; }
+        }
+
+        /* Clase trigger que añade JavaScript durante el cocinado */
+        .cocinando .lomo-vv {
+            animation: voltereta-lomo 0.25s linear infinite; /* ¡Rápido, es vuelta y vuelta! */
+        }
+
+        /* Efecto de humo CSS opcional mientras cocina */
+        .cocinando::after {
+            content: '💨'; position: absolute; font-size: 1.5rem; animation: humo 1s infinite; opacity: 0;
+        }
+        @keyframes humo { 0% { bottom: 20px; opacity: 0; } 50% { opacity: 0.5; } 100% { bottom: 80px; opacity: 0; } }
+        /* ========================================= */
+
+        /* Barra de progreso */
+        .p-container { width: 100%; background: #eee; height: 8px; border-radius: 4px; margin: 10px 0; display: none; overflow: hidden; }
+        .p-bar { width: 0%; height: 100%; background: var(--success); }
+
+        /* Rent a Car UI */
+        .car-row { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 0.9rem; color: var(--text); }
+        .car-row:hover { background: rgba(241, 196, 15, 0.1); }
+
+        /* Ticket y Consola */
+        #ticket, #json-console { padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.85rem; margin-top: 15px; }
+        #ticket { background: #ffffd1; border-left: 4px solid var(--gold); color: #333; }
+        #json-console { background: #1e1e1e; color: #00ff00; white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
+
+        input, select { background: var(--card); color: var(--text); border: 1px solid #ccc; padding: 8px; border-radius: 5px; }
+
+        button { width: 100%; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 5px; transition: 0.3s; }
+        .btn-order { background: var(--success); color: white; }
+        .btn-rent { background: var(--primary); color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="panel">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+            <h2>🍴 TABERNA GOURMET</h2>
+            <button onclick="document.body.classList.toggle('dark-mode')" style="width:40px; margin:0; background:#eee; color:#333">🌙/☀️</button>
+        </div>
+
+        <div class="grid">
+            <div class="card" id="c-tortilla" onclick="pick('tortilla', 3.5)">
+                <span class="stock-tag" id="st-tortilla">10</span>🍳<br>Tortilla
+            </div>
+            <div class="card" id="c-fuet" onclick="pick('fuet', 3.0)">
+                <span class="stock-tag" id="st-fuet">15</span>🥓<br>Fuet
+            </div>
+            <div class="card" id="c-lomo" onclick="pick('lomo', 4.5)">
+                <span class="stock-tag" id="st-lomo">5</span>🥩<br>Lomo V&V
+            </div>
+        </div>
+
+        <div class="preview-box" id="food-view">🍽️</div>
+        
+        <div class="p-container" id="cook-wrap"><div class="p-bar" id="cook-bar"></div></div>
+
+        <select id="mesa-sel" style="margin-bottom:10px">
+            <option value="Barra">📍 Barra</option>
+            <option value="Terraza">☀️ Terraza</option>
+            <option value="Mesa VIP">💎 Mesa VIP</option>
+        </select>
+
+        <button class="btn-order" onclick="marchar()">MARCHAR COMANDA (Ver Animación)</button>
+        <div id="ticket">Selecciona lomo para ver la voltereta...</div>
+    </div>
+
+    <div class="panel">
+        <h2>🚗 MOTORS RENT (S&P 500)</h2>
+        <div id="car-list" class="section" style="margin-bottom:15px; flex-grow:1">
+            <div class="car-row" onclick="pickCar('Tesla Model 3', 100, 'TSLA')"><span>Tesla (TSLA)</span> <b>100€/d</b></div>
+            <div class="car-row" onclick="pickCar('Ford F-150', 85, 'F')"><span>Ford Motor (F)</span> <b>85€/d</b></div>
+            <div class="car-row" onclick="pickCar('GM Silverado', 90, 'GM')"><span>Gen. Motors (GM)</span> <b>90€/d</b></div>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-bottom:10px">
+            <input type="number" id="rent-days" placeholder="Días" min="1" style="width:30%">
+            <input type="text" id="promo" placeholder="Cupón (PROMO2026)" style="width:70%">
+        </div>
+
+        <button class="btn-rent" onclick="procesarEmpresa()">ALQUILAR & EXPORTAR (JSON)</button>
+        
+        <h2 style="margin-top:20px; border-color: var(--success)">📄 SALIDA DE DATOS</h2>
+        <div id="json-console">Esperando exportación...</div>
+    </div>
+</div>
+
+<script>
+    // ESTADO GLOBAL
+    let state = {
+        food: null, foodPrice: 0,
+        car: null, carPrice: 0, carTicker: '',
+        stock: { tortilla: 10, fuet: 15, lomo: 5 },
+        orders: []
+    };
+
+    // LÓGICA TABERNA
+    function pick(id, price) {
+        if(state.stock[id] <= 0) return alert("¡Agotado!");
+        state.food = id; state.foodPrice = price;
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+        document.getElementById('c-'+id).classList.add('active');
+        
+        const view = document.getElementById('food-view');
+        view.classList.remove('cocinando'); // Reset animación por si acaso
+
+        if(id === 'lomo') view.innerHTML = '<div class="lomo-vv"></div>';
+        else if(id === 'fuet') view.innerHTML = '🥖🥓🥓🥖';
+        else view.innerHTML = '🥖🍳🥖';
+    }
+
+    function marchar() {
+        if(!state.food) return alert("¿Qué vas a comer?");
+        const view = document.getElementById('food-view');
+        const bar = document.getElementById('cook-bar');
+        const wrap = document.getElementById('cook-wrap');
+        
+        wrap.style.display = 'block';
+        
+        // ACTIVAR ANIMACIÓN SI ES LOMO
+        if(state.food === 'lomo') {
+            view.classList.add('cocinando');
+        } else {
+            view.classList.remove('cocinando');
+        }
+        
+        let w = 0;
+        // El lomo es vuelta y vuelta (rápido para que la animación coincida)
+        const speed = state.food === 'lomo' ? 25 : 50; 
+        
+        const timer = setInterval(() => {
+            w += 5;
+            bar.style.width = w + '%';
+            if(w >= 100) {
+                clearInterval(timer);
+                completarPedido();
+            }
+        }, speed);
+    }
+
+    function completarPedido() {
+        // DETENER ANIMACIÓN
+        document.getElementById('food-view').classList.remove('cocinando');
+
+        state.stock[state.food]--;
+        document.getElementById('st-'+state.food).innerText = state.stock[state.food];
+        
+        const iva = state.foodPrice * 0.10;
+        const total = state.foodPrice + iva;
+        const mesa = document.getElementById('mesa-sel').value;
+
+        document.getElementById('ticket').innerHTML = `
+            <b>COMANDA SERVIDA</b><br>
+            Lugar: ${mesa}<br>
+            Plato: ${state.food.toUpperCase()}<br>
+            Total (c/IVA): ${total.toFixed(2)}€
+        `;
+        
+        state.orders.push({ item: state.food, total: total });
+        setTimeout(() => document.getElementById('cook-wrap').style.display='none', 1000);
+        
+        if (state.stock[state.food] === 0) {
+            document.getElementById('c-' + state.food).style.opacity = "0.5";
+        }
+    }
+
+    // LÓGICA MOTORS & RENT-A-CAR
+    function pickCar(m, p, t) {
+        state.car = m; state.carPrice = p; state.carTicker = t;
+        document.querySelectorAll('.car-row').forEach(r => r.style.background = 'none');
+        event.currentTarget.style.background = 'rgba(241, 196, 15, 0.2)';
+    }
+
+    const RentACar = {
+        JSON: function() {
+            const dias = parseInt(document.getElementById('rent-days').value) || 0;
+            const cupon = document.getElementById('promo').value;
+            let dto = cupon === "PROMO2026" ? 0.20 : 0;
+            
+            const subtotalCar = state.carPrice * dias;
+            const totalCar = subtotalCar - (subtotalCar * dto);
+            
+            const data = {
+                header: "TABERNA & MOTORS S.A. REPORT",
+                timestamp: new Date().toISOString(),
+                rent_a_car: {
+                    model: state.car,
+                    ticker_sp500: state.carTicker,
+                    days: dias,
+                    discount_applied: (dto * 100) + "%",
+                    cost: totalCar.toFixed(2) + "€"
+                },
+                taberna_history: state.orders,
+                status: "RESERVA_CONFIRMADA"
+            };
+
+            return JSON.stringify(data, null, 4);
+        }
+    };
+
+    function procesarEmpresa() {
+        if(!state.car || !document.getElementById('rent-days').value) {
+            return alert("Selecciona coche y días de alquiler");
+        }
+        const jsonOutput = RentACar.JSON();
+        document.getElementById('json-console').innerText = jsonOutput;
+        console.log("Exportación Exitosa:", JSON.parse(jsonOutput));
+    }
+</script>
+</body>
+</html>

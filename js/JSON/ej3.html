@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ejercicio 3 - jQuery</title>
+    <!-- Importamos jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        table, th, td { border: 1px solid black; border-collapse: collapse; padding: 8px; margin-top: 10px; }
+        th { background-color: #f2f2f2; }
+        .formulario { border: 1px solid #ccc; padding: 15px; width: fit-content; margin-bottom: 20px; }
+        .formulario input { display: block; margin-bottom: 5px; }
+        .hobbies-group { margin: 10px 0; border: 1px dashed #aaa; padding: 10px; }
+        tbody tr { cursor: pointer; transition: background 0.2s; }
+        tbody tr:hover { background-color: #ffe6e6; }
+    </style>
+</head>
+<body>
+
+    <div class="formulario">
+        <h3>Añadir Nuevo Registro</h3>
+        <input type="text" id="nombre" placeholder="Nombre">
+        <input type="text" id="apellidos" placeholder="Apellidos">
+        <input type="number" id="edad" placeholder="Edad">
+        <input type="text" id="ciudad" placeholder="Ciudad">
+        
+        <div class="hobbies-group">
+            <strong>Hobbies:</strong><br>
+            <label><input type="checkbox" name="hobbies[]" value="deporte"> Deporte</label>
+            <label><input type="checkbox" name="hobbies[]" value="lectura"> Lectura</label>
+            <label><input type="checkbox" name="hobbies[]" value="música"> Música</label>
+            <label><input type="checkbox" name="hobbies[]" value="juegos"> Juegos</label>
+            <label><input type="checkbox" name="hobbies[]" value="cine"> Cine</label>
+        </div>
+
+        <button onclick="procesarFormulario()">Insertar en Tabla</button>
+        <button onclick="borrarTabla()" style="background-color: #ffcccc;">BORRAR TODO</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellidos</th>
+                <th>Edad</th>
+                <th>Ciudad</th>
+                <th>Hobbies</th>
+            </tr>
+        </thead>
+        <tbody id="cuerpoTabla"></tbody>
+    </table>
+
+    <div class="estadisticas">
+        <h3>Estadísticas de Edad</h3>
+        <table>
+            <tr>
+                <th>Suma Total</th><th>Media</th><th>Máxima</th><th>Mínima</th>
+            </tr>
+            <tr>
+                <td id="valSuma">0</td><td id="valMedia">0</td><td id="valMax">0</td><td id="valMin">0</td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+    // Funciones de utilidad (se mantienen igual, pero son nativas de JSON)
+    const serializar = (obj) => JSON.stringify(obj);
+    const deserializar = (json) => JSON.parse(json);
+
+    function procesarFormulario() {
+        const campos = [
+            { id: "nombre", etiqueta: "Nombre" },
+            { id: "apellidos", etiqueta: "Apellidos" },
+            { id: "edad", etiqueta: "Edad" },
+            { id: "ciudad", etiqueta: "Ciudad" }
+        ];
+
+        // Validación con jQuery
+        for (let campo of campos) {
+            if ($(`#${campo.id}`).val().trim() === "") {
+                alert(`El campo ${campo.etiqueta} es obligatorio.`);
+                return;
+            }
+        }
+
+        // Lógica de lectura de checkboxes (Extraído de image_0f943f.png)
+        let hobbiesSeleccionados = $('input[name="hobbies[]"]')
+            .filter(':checked')
+            .map(function() {
+                return $(this).val();
+            }).get();
+
+        if (hobbiesSeleccionados.length === 0) {
+            alert("Selecciona al menos un hobby.");
+            return;
+        }
+
+        let nuevoObjeto = {
+            nombre: $("#nombre").val(),
+            apellidos: $("#apellidos").val(),
+            edad: $("#edad").val(),
+            ciudad: $("#ciudad").val(),
+            hobbies: hobbiesSeleccionados.join(", ")
+        };
+
+        insertarFila(deserializar(serializar(nuevoObjeto)));
+        limpiarFormulario();
+        actualizarEstadisticas();
+    }
+
+    function insertarFila(datos) {
+        // Creamos la fila y definimos el evento click para borrarla
+        const $fila = $("<tr>").on("click", function() {
+            $(this).remove();
+            actualizarEstadisticas();
+        });
+
+        // Insertamos las celdas
+        $fila.append($("<td>").text(datos.nombre));
+        $fila.append($("<td>").text(datos.apellidos));
+        $fila.append($("<td>").text(datos.edad));
+        $fila.append($("<td>").text(datos.ciudad));
+        $fila.append($("<td>").text(datos.hobbies));
+
+        $("#cuerpoTabla").append($fila);
+    }
+
+    function limpiarFormulario() {
+        // Limpia todos los inputs y desmarca checkboxes
+        $(".formulario input").val("");
+        $('input[name="hobbies[]"]').prop('checked', false);
+    }
+
+    function borrarTabla() {
+        $("#cuerpoTabla").empty();
+        actualizarEstadisticas();
+    }
+
+    function actualizarEstadisticas() {
+        let edades = [];
+        
+        // Recorremos las filas con .each()
+        $("#cuerpoTabla tr").each(function() {
+            let edad = parseInt($(this).find("td").eq(2).text());
+            if (!isNaN(edad)) edades.push(edad);
+        });
+
+        if (edades.length === 0) {
+            $("#valSuma, #valMedia, #valMax, #valMin").text("0");
+            return;
+        }
+
+        let suma = edades.reduce((a, b) => a + b, 0);
+        let media = $suma / edades.length$; // Usando LaTeX para la fórmula conceptual
+
+        $("#valSuma").text(suma);
+        $("#valMedia").text((suma / edades.length).toFixed(2));
+        $("#valMax").text(Math.max(...edades));
+        $("#valMin").text(Math.min(...edades));
+    }
+    </script>
+</body>
+</html>
