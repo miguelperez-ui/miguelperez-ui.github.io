@@ -24,6 +24,10 @@
             padding-bottom: 10px;
         }
 
+        h2{
+            color: #2c3f70;
+        }
+
         /* Contenedor tipo cuadrícula para los enlaces */
         .contenedor-actividades {
             display: grid;
@@ -42,20 +46,20 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             text-decoration: none; /* Quita el subrayado del enlace */
             color: inherit; /* Mantiene el color del texto normal */
-            border-left: 5px solid #3498db;
+            border-left: 5px solid darkgreen;
         }
 
         /* Efecto al pasar el ratón por encima */
         .actividad-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-            border-left-color: #2980b9;
+            border-left-color: darkolivegreen;
         }
 
         .actividad-titulo {
             font-size: 1.3em;
             font-weight: bold;
-            color: #2c3e50;
+            color: green;
             margin-bottom: 10px;
         }
 
@@ -68,21 +72,37 @@
 </head>
 <body>
 
-    <h1>Índice de Mis Actividades</h1>
+<h1>Índice de Mis Actividades</h1>
+<h2>Miguel Pérez</h2>
 
-    <div class="contenedor-actividades">
-        
-        <!-- Tarjeta de Actividad 1 -->
-        <a href="..\página2.html" class="actividad-card">
-            <div class="actividad-titulo">JSON</div>
-            <div class="actividad-desc">Ejercicios de JSON.</div>
-        </a>
+<div class="contenedor-actividades">
 
-       
+    <!-- Tarjeta de Actividad 1 -->
+    <a href="Ejercicio1.html" class="actividad-card">
+        <div class="actividad-titulo">Ejercicio1</div>
+    </a>
 
-        <!-- Puedes copiar y pegar el bloque de arriba para añadir más actividades -->
+    <a href="prueba1.html" class="actividad-card">
+        <div class="actividad-titulo">Prueba1</div>
+    </a>
 
-    </div>
+    <!-- Tarjeta de Actividad 2 -->
+    <a href="Ejercicio2.html" class="actividad-card">
+        <div class="actividad-titulo">Ejercicio2</div>
+    </a>
+
+    <a href="ej2megareto.html" class="actividad-card">
+        <div class="actividad-titulo">Ejercicio2 MegaReto</div>
+    </a>
+
+    <a href="ej3.html" class="actividad-card">
+        <div class="actividad-titulo">Ejercicio3</div>
+    </a>
+
+
+
+
+</div>
 
 </body>
 </html>

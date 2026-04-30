@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Ejercicio 5</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>Adivina el número (1 al 100)</h1>
+
+    <div class="formulario">
+        <p>Puntos Totales: <span id="puntosTotales">0</span></p>
+        <p>Cartera actual: <span id="puntosCartera">10</span></p>
+
+        <div class="campo">
+            <label for="entradaNumero">Dime un número:</label>
+            <input type="number" id="entradaNumero">
+        </div>
+        <button onclick="comprobarIntento()">Enviar</button>
+        
+        <p id="mensaje"></p>
+    </div>
+
+    <script>
+        let numeroSecreto = Math.floor(Math.random() * 100) + 1;
+        let puntosTotales = 0;
+        let cartera = 10;
+
+        function comprobarIntento() {
+           
+            let numeroUsuario = Number(document.getElementById("entradaNumero").value);
+            let mensajePantalla = document.getElementById("mensaje");
+
+
+            
+            if (numeroUsuario === numeroSecreto) {
+                puntosTotales = puntosTotales + cartera;
+                alert("¡Acertaste! Sumas " + cartera + " puntos.");
+                
+                
+                document.getElementById("puntosTotales").innerText = puntosTotales;
+                
+              
+                cartera = 10;
+                numeroSecreto = Math.floor(Math.random() * 100) + 1;
+                document.getElementById("puntosCartera").innerText = cartera;
+                mensajePantalla.innerText = "¡Número nuevo generado! Sigue jugando.";
+            } 
+            else {
+               
+                cartera = cartera - 1;
+                document.getElementById("puntosCartera").innerText = cartera;
+
+                
+                if (numeroUsuario < numeroSecreto) {
+                    mensajePantalla.innerText = "Más alto...";
+                } else {
+                    mensajePantalla.innerText = "Más bajo...";
+                }
+
+
+                if (cartera <= 0) {
+                    alert("Game Over. Te has quedado sin puntos en la cartera.");
+                    location.reload(); //Pierdo los puntos
+                }
+            }
+        }
+    </script>
+</body>
+</html>

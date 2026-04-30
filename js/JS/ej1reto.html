@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Ejemplo 1 reto</title>
+       
+    </head>
+    <body>
+        <div>
+            <table border="1">
+             <thead>
+              <tr>
+                 <th>Nombre</th>
+                 <th>Apellidos</th>
+                 <th>Edad</th>
+                  <th>Ciudad</th>
+              </tr>
+             </thead>
+             <tbody>
+              <tr>
+                 <td id="nombre"></td>
+                 <td id="apellidos"></td>
+                 <td id="edad"></td>
+                 <td id="ciudad"></td>
+              </tr>
+             </tbody>
+          </table>
+        </div>
+        <script> 
+         $(document).ready(function() {
+            function serializar(obj){
+                return JSON.stringify(obj)
+            }
+            function deserializar(str){
+                return JSON.parse(str)
+            }
+
+            var persona = {nombre: "Alberto", apellido: "García", edad: "267", ciudad: "Arahal"}
+
+            var jsonString = serializar(persona)
+            console.log("Mendaje serializado" + jQuery)
+         });
+        </script>
+    </body>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
