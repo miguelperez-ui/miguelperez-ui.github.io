@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Actividades</title>
+    <style>
+        /* Estilos generales de la página */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        h2{
+            color: #2c3f70;
+        }
+
+        /* Contenedor tipo cuadrícula para los enlaces */
+        .contenedor-actividades {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* Estilos para cada tarjeta/enlace */
+        .actividad-card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none; /* Quita el subrayado del enlace */
+            color: inherit; /* Mantiene el color del texto normal */
+            border-left: 5px solid darkorange;
+        }
+
+        /* Efecto al pasar el ratón por encima */
+        .actividad-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            border-left-color: orangered;
+        }
+
+        .actividad-titulo {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: orange;
+            margin-bottom: 10px;
+        }
+
+        .actividad-desc {
+            font-size: 0.95em;
+            color: #666;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Índice de los temas del curso</h1>
+<h2>Miguel Pérez</h2>
+
+<div class="contenedor-actividades">
+
+
+    <a href="Tema2/index.html" class="actividad-card">
+        <div class="actividad-titulo">Tema 2</div>
+        <div class="actividad-desc">Empezando con JavaScript</div>
+    </a>
+
+    <a href="Tema3/index.html" class="actividad-card">
+        <div class="actividad-titulo">Tema 3</div>
+        <div class="actividad-desc">Primeras interacciones</div>
+    </a>
+
+    <a href="Tema4/index.html" class="actividad-card">
+        <div class="actividad-titulo">Tema 4</div>
+        <div class="actividad-desc">Una baraja de cartas</div>
+    </a>
+
+    <a href="Tema5/index.html" class="actividad-card">
+        <div class="actividad-titulo">Tema 5</div>
+        <div class="actividad-desc">Un juego de memory</div>
+    </a>
+
+    <a href="Tema6/index.html" class="actividad-card">
+        <div class="actividad-titulo">Tema 6</div>
+        <div class="actividad-desc">Sube de nivel</div>
+    </a>
+
+    <a href="Tema7/index.html" class="actividad-card">
+        <div class="actividad-titulo">Tema 7</div>
+        <div class="actividad-desc">Librerías y recursos</div>
+    </a>
+
+
+
+</div>
+
+</body>
+</html>
