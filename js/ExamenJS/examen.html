@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Juego del Ahorcado</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="game-container">
+  <h1>El Ahorcado</h1>
+
+  <!-- Contenedor donde se verán los guiones o letras -->
+  <div id="word-display" class="word-style"></div>
+
+  <div class="input-area">
+    <input type="text" id="letter-input" maxlength="1" placeholder="?" autocomplete="off">
+    <button onclick="procesarIntento()">Adivinar</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
