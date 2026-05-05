@@ -1,0 +1,46 @@
+function recogeDatos(evento) {
+  evento.preventDefault();
+
+  var nombre = document.querySelector("#nombre").value;
+  var fecha = document.querySelector("#fecha").value;
+  var edad = 2026 - fecha;
+
+  var bienvenida = document.querySelector("#bienvenida");
+
+  // EJERCICIO: declara las variables necesarias (puedes necesitar
+  // más de una) para componer el mensaje de bienvenida
+
+  var mensajeAdicional;
+  var mensaje;
+
+  // EJERCICIO: crea un condicional que dé un mensaje u otro en
+  // función de la edad
+  if(edad>18){
+    mensajeAdicional = "eres mayor que yo."
+  }else if (edad<18){
+    mensajeAdicional = "eres menor que yo."
+  }else{
+    mensajeAdicional = "tienes mi edad."
+  }
+
+  // BONUS: si quieres, puedes comprobar si alguno de los campos
+  // está vacío y modificar el mensaje de bienvenida para pedir
+  // Que se rellene
+
+  if(fecha.trim() ===""|| nombre.trim() ===""){
+    mensaje="Tienes que rellenar los campos"
+  }
+
+  // EJERCICIO: Realiza la composición del mensaje final y cárgalo
+  // en la variable que hayas preparado
+
+  mensaje = "Hola "+ nombre +", tienes " + edad + " años, " + mensajeAdicional;
+
+  // EJERCICIO: Añade el mensaje final como contenido HTML del
+  // nodo que hemos cargado en la variable bienvenida
+  bienvenida.innerHTML = mensaje;
+}
+
+var miForm = document.querySelector("#formulario");
+
+miForm.addEventListener("submit", recogeDatos);
