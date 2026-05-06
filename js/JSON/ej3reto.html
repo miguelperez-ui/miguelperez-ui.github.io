@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ejercicio 3 Reto - jQuery</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    table, th, td { border: 1px solid black; border-collapse: collapse; padding: 8px; margin-top: 10px; }
+    th { background-color: #f2f2f2; }
+    .formulario { border: 1px solid #ccc; padding: 15px; width: fit-content; margin-bottom: 20px; }
+    .formulario input { display: block; margin-bottom: 5px; }
+    .hobbies-group { margin: 10px 0; border: 1px dashed #aaa; padding: 10px; }
+    tbody tr { cursor: pointer; transition: background 0.2s; }
+    tbody tr:hover { background-color: #ffe6e6; }
+    /* Estilo opcional para que se note el bloqueo */
+    input:disabled + span { color: #ccc; }
+  </style>
+</head>
+<body>
+
+<div class="formulario">
+  <h3>Añadir Nuevo Registro (Máx. 3 Hobbies)</h3>
+  <input type="text" id="nombre" placeholder="Nombre">
+  <input type="text" id="apellidos" placeholder="Apellidos">
+  <input type="number" id="edad" placeholder="Edad">
+  <input type="text" id="ciudad" placeholder="Ciudad">
+
+  <div class="hobbies-group">
+    <strong>Hobbies (máximo 3):</strong><br>
+    <label><input type="checkbox" name="hobbies[]" value="deporte"> <span>Deporte</span></label>
+    <label><input type="checkbox" name="hobbies[]" value="lectura"> <span>Lectura</span></label>
+    <label><input type="checkbox" name="hobbies[]" value="música"> <span>Música</span></label>
+    <label><input type="checkbox" name="hobbies[]" value="juegos"> <span>Juegos</span></label>
+    <label><input type="checkbox" name="hobbies[]" value="cine"> <span>Cine</span></label>
+  </div>
+
+  <button onclick="procesarFormulario()">Insertar en Tabla</button>
+  <button onclick="borrarTabla()" style="background-color: #ffcccc;">BORRAR TODO</button>
+</div>
+
+<!-- ... (resto de la tabla igual que tu código anterior) ... -->
+<table>
+  <thead>
+  <tr>
+    <th>Nombre</th><th>Apellidos</th><th>Edad</th><th>Ciudad</th><th>Hobbies</th>
+  </tr>
+  </thead>
+  <tbody id="cuerpoTabla"></tbody>
+</table>
+
+<div class="estadisticas">
+  <h3>Estadísticas de Edad</h3>
+  <table>
+    <tr><th>Suma Total</th><th>Media</th><th>Máxima</th><th>Mínima</th></tr>
+    <tr><td id="valSuma">0</td><td id="valMedia">0</td><td id="valMax">0</td><td id="valMin">0</td></tr>
+  </table>
+</div>
+
+<script>
+  // --- LÓGICA DEL RETO (jQuery) ---
+  $(document).ready(function() {
+    $('input[name="hobbies[]"]').on('change', function() {
+      // Contamos cuántos están marcados
+      let marcados = $('input[name="hobbies[]"]:checked').length;
+
+      if (marcados >= 3) {
+        // Si llegamos a 3, desactivamos los que NO estén marcados
+        $('input[name="hobbies[]"]:not(:checked)').prop('disabled', true);
+      } else {
+        // Si hay menos de 3, todos deben estar habilitados
+        $('input[name="hobbies[]"]').prop('disabled', false);
+      }
+    });
+  });
+
+  // --- RESTO DE FUNCIONES (Vanilla JS) ---
+  const serializar = (obj) => JSON.stringify(obj);
+  const deserializar = (json) => JSON.parse(json);
+
+  function procesarFormulario() {
+    const campos = [
+      { id: "nombre", etiqueta: "Nombre" },
+      { id: "apellidos", etiqueta: "Apellidos" },
+      { id: "edad", etiqueta: "Edad" },
+      { id: "ciudad", etiqueta: "Ciudad" }
+    ];
+
+    for (let campo of campos) {
+      const elemento = document.getElementById(campo.id);
+      if (elemento.value.trim() === "") {
+        alert(`El campo ${campo.etiqueta} es obligatorio.`);
+        return;
+      }
+    }
+
+    const hobbiesCheckboxes = document.querySelectorAll('input[name="hobbies[]"]:checked');
+    const hobbiesSeleccionados = Array.from(hobbiesCheckboxes).map(cb => cb.value);
+
+    if (hobbiesSeleccionados.length === 0) {
+      alert("Selecciona al menos un hobby.");
+      return;
+    }
+
+    const nuevoObjeto = {
+      nombre: document.getElementById("nombre").value,
+      apellidos: document.getElementById("apellidos").value,
+      edad: document.getElementById("edad").value,
+      ciudad: document.getElementById("ciudad").value,
+      hobbies: hobbiesSeleccionados.join(", ")
+    };
+
+    insertarFila(deserializar(serializar(nuevoObjeto)));
+    limpiarFormulario();
+    actualizarEstadisticas();
+  }
+
+  function insertarFila(datos) {
+    const cuerpoTabla = document.getElementById("cuerpoTabla");
+    const fila = document.createElement("tr");
+    fila.addEventListener("click", function() {
+      this.remove();
+      actualizarEstadisticas();
+    });
+
+    const valores = [datos.nombre, datos.apellidos, datos.edad, datos.ciudad, datos.hobbies];
+    valores.forEach(texto => {
+      const celda = document.createElement("td");
+      celda.textContent = texto;
+      fila.appendChild(celda);
+    });
+    cuerpoTabla.appendChild(fila);
+  }
+
+  function limpiarFormulario() {
+    const inputs = document.querySelectorAll(".formulario input");
+    inputs.forEach(input => {
+      if (input.type === "checkbox") {
+        input.checked = false;
+        input.disabled = false; // IMPORTANTE: Re-habilitar al limpiar
+      } else {
+        input.value = "";
+      }
+    });
+  }
+
+  function borrarTabla() {
+    document.getElementById("cuerpoTabla").innerHTML = "";
+    actualizarEstadisticas();
+  }
+
+  function actualizarEstadisticas() {
+    const filas = document.querySelectorAll("#cuerpoTabla tr");
+    let edades = [];
+    filas.forEach(fila => {
+      const edad = parseInt(fila.cells[2].textContent);
+      if (!isNaN(edad)) edades.push(edad);
+    });
+
+    const valSuma = document.getElementById("valSuma");
+    const valMedia = document.getElementById("valMedia");
+    const valMax = document.getElementById("valMax");
+    const valMin = document.getElementById("valMin");
+
+    if (edades.length === 0) {
+      [valSuma, valMedia, valMax, valMin].forEach(el => el.textContent = "0");
+      return;
+    }
+
+    let suma = 0;
+    for (let edad of edades) { suma += edad; }
+
+    valSuma.textContent = suma;
+    valMedia.textContent = (suma / edades.length).toFixed(2);
+    valMax.textContent = Math.max(...edades);
+    valMin.textContent = Math.min(...edades);
+  }
+</script>
+</body>
+</html>

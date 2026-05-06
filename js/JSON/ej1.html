@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Ejercicio 1 - Eliminar Filas</title>
+        <style>
+            table, th, td { border: 1px solid black; border-collapse: collapse; padding: 8px; margin-top: 10px; }
+            th { background-color: #f2f2f2; }
+            .formulario { margin-bottom: 20px; border: 1px solid #ccc; padding: 15px; width: fit-content; }
+            input { margin-bottom: 5px; display: block; }
+            /* Estilo para que se note que la fila es clicable */
+            tbody tr { cursor: pointer; transition: background 0.2s; }
+            tbody tr:hover { background-color: #ffe6e6; }
+        </style>
+    </head>
+    <body>
+
+        <div class="formulario">
+            <h3>Añadir Nuevo Registro</h3>
+            <input type="text" id="nombre" placeholder="Nombre">
+            <input type="text" id="apellidos" placeholder="Apellidos">
+            <input type="number" id="edad" placeholder="Edad">
+            <input type="text" id="ciudad" placeholder="Ciudad">
+            
+            <button onclick="procesarFormulario()">Insertar en Tabla</button>
+            <button onclick="borrarTabla()" style="background-color: #ffcccc;">BORRAR TODO</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellidos</th>
+                    <th>Edad</th>
+                    <th>Ciudad</th>
+                </tr>
+            </thead>
+            <tbody id="cuerpoTabla"></tbody>
+        </table>
+
+        <hr>
+
+        <div id="" >Edad media:<p></p></div>                
+
+        <script>
+            function serializar(obj) { return JSON.stringify(obj); }
+            function deserializar(json) { return JSON.parse(json); }
+
+            function procesarFormulario() {
+                const campos = [
+                    { id: "nombre", etiqueta: "Nombre" },
+                    { id: "apellidos", etiqueta: "Apellidos" },
+                    { id: "edad", etiqueta: "Edad" },   
+                    { id: "ciudad", etiqueta: "Ciudad" }
+                ];
+
+                for (let i = 0; i < campos.length; i++) {
+                    let input = document.getElementById(campos[i].id);
+                    if (input.value.trim() === "") {
+                        alert("El campo " + campos[i].etiqueta + " es obligatorio.");
+                        input.focus();
+                        return;
+                    }
+                }
+
+                let nuevoObjeto = {
+                    nombre: document.getElementById("nombre").value,
+                    apellidos: document.getElementById("apellidos").value,
+                    edad: document.getElementById("edad").value,
+                    ciudad: document.getElementById("ciudad").value
+                };
+
+                let objetoListo = deserializar(serializar(nuevoObjeto));
+                insertarCelda(objetoListo);
+                limpiarFormulario();
+            }
+
+            function insertarCelda(datos) {
+                let tabla = document.getElementById("cuerpoTabla");
+                let nuevaFila = tabla.insertRow();
+                
+                // --- ASIGNACIÓN DEL EVENTO ELIMINAR ---
+                nuevaFila.onclick = function() {
+                    this.remove(); 
+                };
+
+                nuevaFila.insertCell(0).textContent = datos.nombre;
+                nuevaFila.insertCell(1).textContent = datos.apellidos;
+                nuevaFila.insertCell(2).textContent = datos.edad;
+                nuevaFila.insertCell(3).textContent = datos.ciudad;
+            }
+
+            function limpiarFormulario() {
+                let inputs = document.querySelectorAll(".formulario input");
+                inputs.forEach(input => input.value = "");
+            }
+
+            function borrarTabla() {
+                document.getElementById("cuerpoTabla").innerHTML = "";
+            }
+
+            function operacionesEdad(){
+                document.getElementById("edad")
+            }
+        </script>
+    </body>
+</html>

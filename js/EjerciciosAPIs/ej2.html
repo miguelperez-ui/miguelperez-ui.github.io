@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio 2 - Futbolero Premier</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #3d195b; color: white; min-height: 100vh; } /* Color corporativo Premier League */
+        .card { color: #333; border-radius: 15px; overflow: hidden; }
+        .badge-img { max-width: 150px; margin: -75px auto 10px; background: white; padding: 10px; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .stadium-img { width: 100%; height: 250px; object-fit: cover; }
+        .info-container { display: none; }
+        #loader { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League Info</h1>
+        <p class="lead">Selecciona tu equipo para ver sus detalles</p>
+
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <select id="teamSelector" class="form-select form-select-lg">
+                    <option value="" selected disabled>Elige un equipo...</option>
+                    <option value="Arsenal">Arsenal</option>
+                    <option value="Aston Villa">Aston Villa</option>
+                    <option value="Chelsea">Chelsea</option>
+                    <option value="Everton">Everton</option>
+                    <option value="Liverpool">Liverpool</option>
+                    <option value="Manchester City">Manchester City</option>
+                    <option value="Manchester United">Manchester United</option>
+                    <option value="Newcastle United">Newcastle United</option>
+                    <option value="Tottenham">Tottenham Hotspur</option>
+                    <option value="West Ham">West Ham United</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div id="loader" class="text-center">
+        <div class="spinner-border text-light" role="status"></div>
+    </div>
+
+    <div id="infoEquipo" class="info-container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <img id="imgEstadio" src="" class="stadium-img" alt="Estadio">
+                    <div class="card-body text-center pt-0">
+                        <img id="imgEscudo" src="" class="badge-img d-block" alt="Escudo">
+                        <h2 id="nombreEquipo" class="card-title fw-bold"></h2>
+                        <p id="nombreEstadio" class="text-muted mb-3"></p>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-6 col-sm-3">
+                                <strong>Fundación</strong><br><span id="fundacion"></span>
+                            </div>
+                            <div class="col-6 col-sm-3">
+                                <strong>Ciudad</strong><br><span id="ciudad"></span>
+                            </div>
+                            <div class="col-12 col-sm-6 text-sm-start">
+                                <strong>Web Oficial</strong><br>
+                                <a id="webOficial" href="#" target="_blank" class="text-decoration-none"></a>
+                            </div>
+                        </div>
+
+                        <p id="descripcion" class="text-start px-3" style="font-size: 0.9rem;"></p>
+
+                        <div class="mt-4 pt-3 border-top">
+                            <a id="linkFB" href="#" target="_blank" class="btn btn-outline-primary btn-sm me-2">Facebook</a>
+                            <a id="linkTW" href="#" target="_blank" class="btn btn-outline-info btn-sm me-2">Twitter/X</a>
+                            <a id="linkIG" href="#" target="_blank" class="btn btn-outline-danger btn-sm">Instagram</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const selector = document.getElementById('teamSelector');
+    const infoContainer = document.getElementById('infoEquipo');
+    const loader = document.getElementById('loader');
+
+    selector.addEventListener('change', async (e) => {
+        const teamName = e.target.value;
+        if (!teamName) return;
+
+        // Mostrar carga
+        loader.style.display = 'block';
+        infoContainer.style.display = 'none';
+
+        try {
+            const url = `https://thesportsdb.com/api/v1/json/3/searchteams.php?t=${teamName}`;
+            const res = await fetch(url);
+            const data = await res.json();
+
+            if (data.teams && data.teams.length > 0) {
+                const equipo = data.teams[0];
+                rellenarDatos(equipo);
+            } else {
+                alert("No se encontró información del equipo.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Hubo un fallo al conectar con la API.");
+        } finally {
+            loader.style.display = 'none';
+        }
+    });
+
+    function rellenarDatos(e) {
+        // Textos básicos
+        document.getElementById('nombreEquipo').textContent = e.strTeam;
+        document.getElementById('nombreEstadio').textContent = `🏟️ ${e.strStadium} (${e.intStadiumCapacity} espectadores)`;
+        document.getElementById('fundacion').textContent = e.intFormedYear;
+        document.getElementById('ciudad').textContent = e.strLocation;
+        document.getElementById('descripcion').textContent = e.strDescriptionES || e.strDescriptionEN;
+
+        // Imágenes
+        document.getElementById('imgEscudo').src = e.strBadge;
+        document.getElementById('imgEstadio').src = e.strStadiumThumb || 'https://via.placeholder.com/800x400?text=Sin+Imagen';
+
+        // Enlaces
+        const web = document.getElementById('webOficial');
+        web.href = `https://${e.strWebsite}`;
+        web.textContent = e.strWebsite;
+
+        // Redes Sociales (Manejo de visibilidad si no existen)
+        configurarLink('linkFB', e.strFacebook);
+        configurarLink('linkTW', e.strTwitter);
+        configurarLink('linkIG', e.strInstagram);
+
+        // Mostrar el contenedor
+        infoContainer.style.display = 'block';
+    }
+
+    function configurarLink(id, url) {
+        const btn = document.getElementById(id);
+        if (url) {
+            btn.href = `https://${url}`;
+            btn.style.display = 'inline-block';
+        } else {
+            btn.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>

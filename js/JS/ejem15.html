@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Biblioteca Municipal - Gestión de Préstamos</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f4f1ea; padding: 40px; } /* Color papel antiguo */
+    .biblioteca-header { border-bottom: 3px double #8b4513; margin-bottom: 30px; padding-bottom: 10px; color: #8b4513; }
+    .card-formulario { border: 1px solid #d2b48c; background: #fffaf0; }
+    .libro-destacado { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="biblioteca-header text-center">
+    <h1>📖 Registro de Préstamos Bibliotecarios</h1>
+  </div>
+
+  <div class="row">
+    <div class="col-md-5">
+      <div class="card card-formulario p-4 shadow-sm">
+        <h5 class="mb-3">Nueva Reserva</h5>
+        <div class="mb-2">
+          <label>Título del Libro:</label>
+          <input type="text" id="titulo" class="form-control" placeholder="Ej: Don Quijote de la Mancha">
+        </div>
+        <div class="mb-2">
+          <label>Autor:</label>
+          <input type="text" id="autor" class="form-control" placeholder="Ej: Miguel de Cervantes">
+        </div>
+        <div class="mb-2">
+          <label>ISBN (13 dígitos):</label>
+          <input type="text" id="isbn" class="form-control" placeholder="9780000000000" maxlength="13">
+        </div>
+        <div class="mb-3">
+          <label>Días de préstamo (máx. 15):</label>
+          <input type="number" id="dias" class="form-control" value="7" min="1" max="15">
+        </div>
+        <button id="btnReservar" class="btn btn-brown w-100" style="background: #8b4513; color: white;">
+          Confirmar Reserva
+        </button>
+      </div>
+
+      <button id="btnSincronizar" class="btn btn-outline-dark w-100 mt-3">
+        📜 Enviar Lote de Reservas a Central
+      </button>
+    </div>
+
+    <div class="col-md-7">
+      <div class="bg-white p-3 border rounded shadow-sm">
+        <table class="table table-hover">
+          <thead>
+          <tr>
+            <th>Título</th><th>ISBN</th><th>Días</th><th>Devolución</th>
+          </tr>
+          </thead>
+          <tbody id="tablaLibros">
+          </tbody>
+        </table>
+      </div>
+
+      <div id="infoDestacada" class="libro-destacado mt-4" style="display: none;">
+        <h6>📑 Reserva con periodo más largo:</h6>
+        <p class="mb-0">El libro <strong id="libroMax"></strong> se ha prestado por <strong id="diasMax"></strong> días.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let prestamos = [];
+
+  // 1. REGISTRAR RESERVA
+  $("#btnReservar").click(function() {
+    let tit = $("#titulo").val().trim();
+    let aut = $("#autor").val().trim();
+    let isbn = $("#isbn").val().trim();
+    let dias = parseInt($("#dias").val());
+
+    // Validaciones: Campos vacíos e ISBN de 13 dígitos
+    if (!tit || !aut || !isbn || isNaN(dias)) {
+      alert("Rellena todos los campos.");
+      return;
+    }
+
+    if (isbn.length !== 13) {
+      alert("El ISBN debe tener exactamente 13 dígitos.");
+      return;
+    }
+
+    // CÁLCULO DE FECHA DE DEVOLUCIÓN
+    // Obtenemos la fecha de hoy y sumamos los días
+    let hoy = new Date();
+    hoy.setDate(hoy.getDate() + dias);
+
+    // Formateamos la fecha a algo legible: DD/MM/YYYY
+    let fechaDevolucion = hoy.toLocaleDateString('es-ES');
+
+    let reserva = {
+      titulo: tit,
+      autor: aut,
+      isbn: isbn,
+      periodo: dias,
+      devolucion: fechaDevolucion
+    };
+
+    prestamos.push(reserva);
+    actualizarInterfaz();
+
+    // Limpiamos
+    $("#titulo, #autor, #isbn").val("");
+  });
+
+  // 2. ACTUALIZAR TABLA Y BUSCAR EL MÁXIMO
+  function actualizarInterfaz() {
+    $("#tablaLibros").empty();
+
+    let maxDias = 0;
+    let tituloMasLargo = "";
+
+    for (let p of prestamos) {
+      let fila = `<tr>
+                <td>${p.titulo}</td>
+                <td>${p.isbn}</td>
+                <td>${p.periodo}</td>
+                <td><span class="text-danger fw-bold">${p.devolucion}</span></td>
+            </tr>`;
+      $("#tablaLibros").append(fila);
+
+      // Lógica para encontrar el libro con préstamo más largo
+      if (p.periodo > maxDias) {
+        maxDias = p.periodo;
+        tituloMasLargo = p.titulo;
+      }
+    }
+
+    // Mostrar u ocultar la sección de destacado
+    if (prestamos.length > 0) {
+      $("#infoDestacada").show();
+      $("#libroMax").text(tituloMasLargo);
+      $("#diasMax").text(maxDias);
+    }
+  }
+
+  // 3. ENVÍO AL SERVIDOR (ECO)
+  $("#btnSincronizar").click(function() {
+    if (prestamos.length === 0) {
+      alert("No hay reservas que enviar.");
+      return;
+    }
+
+    $.ajax({
+      url: "https://lm.iesnervion.es/eco.php",
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(prestamos),
+      success: function(respuesta) {
+        console.log("Respuesta recibida:", respuesta);
+        alert("Sincronización con la base de datos de la biblioteca completada.");
+      },
+      error: function() {
+        alert("Error de conexión con el servidor de la biblioteca.");
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

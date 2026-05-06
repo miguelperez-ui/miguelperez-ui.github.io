@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Control de Gastos de Viaje</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f0f4f8; padding: 30px; }
+        .caro { background-color: #ffe8cc !important; } /* Naranja suave para gastos > 100€ */
+        .resumen { background: white; border-left: 5px solid #0d6efd; padding: 15px; border-radius: 5px; }
+        .tabla-contenedor { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 class="mb-4">✈️ Informe de Gastos de Empresa</h2>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm">
+                <h5>Nuevo Gasto</h5>
+                <label>Concepto:</label>
+                <input type="text" id="concepto" class="form-control mb-2" placeholder="Ej: Hotel Sevilla">
+
+                <label>Importe (€):</label>
+                <input type="number" id="importe" class="form-control mb-2" placeholder="0.00">
+
+                <label>Categoría:</label>
+                <select id="categoria" class="form-select mb-2">
+                    <option value="Transporte">Transporte</option>
+                    <option value="Comida">Comida</option>
+                    <option value="Alojamiento">Alojamiento</option>
+                </select>
+
+                <label>Fecha:</label>
+                <input type="date" id="fecha" class="form-control mb-3">
+
+                <button id="btnGuardar" class="btn btn-primary w-100">Añadir Gasto</button>
+            </div>
+
+            <button id="btnSincronizar" class="btn btn-success w-100 mt-3">
+                ☁️ Enviar Informe al Servidor
+            </button>
+        </div>
+
+        <div class="col-md-8">
+            <div class="tabla-contenedor">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Importe</th>
+                    </tr>
+                    </thead>
+                    <tbody id="cuerpoTabla">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="resumen mt-4">
+                <h5>📊 Resumen por Categoría</h5>
+                <div id="statsDetalle">
+                    <p>Transporte: <strong>0€</strong> | Comida: <strong>0€</strong> | Alojamiento: <strong>0€</strong></p>
+                </div>
+                <hr>
+                <h4>Total Acumulado: <span id="totalGeneral" class="text-primary">0</span> €</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Nuestra "base de datos" local en un array
+    let misGastos = [];
+
+    // 1. FUNCIÓN PARA AÑADIR GASTO
+    $("#btnGuardar").click(function() {
+        let concepto = $("#concepto").val();
+        let importe = parseFloat($("#importe").val());
+        let categoria = $("#categoria").val();
+        let fecha = $("#fecha").val();
+
+        // Validación básica
+        if (!concepto || !importe || !fecha) {
+            alert("Rellena todos los campos, por favor.");
+            return;
+        }
+
+        // Creamos el objeto del gasto
+        let gasto = {
+            concepto: concepto,
+            importe: importe,
+            categoria: categoria,
+            fecha: fecha
+        };
+
+        // Lo metemos en el saco
+        misGastos.push(gasto);
+
+        // Actualizamos la vista
+        dibujarTabla();
+
+        // Limpiamos solo los campos de texto
+        $("#concepto, #importe").val("");
+    });
+
+    // 2. FUNCIÓN PARA PINTAR LA TABLA Y CALCULAR STATS
+    function dibujarTabla() {
+        $("#cuerpoTabla").empty();
+
+        let totalTotal = 0;
+        let totalesPorCat = { "Transporte": 0, "Comida": 0, "Alojamiento": 0 };
+
+        for (let g of misGastos) {
+            // Lógica del ejercicio: si > 100€, ponemos clase "caro" (naranja)
+            let colorClase = (g.importe > 100) ? "caro" : "";
+
+            let fila = `<tr class="${colorClase}">
+                <td>${g.fecha}</td>
+                <td>${g.concepto}</td>
+                <td>${g.categoria}</td>
+                <td>${g.importe.toFixed(2)} €</td>
+            </tr>`;
+
+            $("#cuerpoTabla").append(fila);
+
+            // Sumamos para las estadísticas
+            totalTotal += g.importe;
+            totalesPorCat[g.categoria] += g.importe;
+        }
+
+        // Mostramos los resultados en la interfaz
+        $("#totalGeneral").text(totalTotal.toFixed(2));
+        $("#statsDetalle").html(`
+            <p>
+                Transporte: <strong>${totalesPorCat["Transporte"].toFixed(2)}€</strong> |
+                Comida: <strong>${totalesPorCat["Comida"].toFixed(2)}€</strong> |
+                Alojamiento: <strong>${totalesPorCat["Alojamiento"].toFixed(2)}€</strong>
+            </p>
+        `);
+    }
+
+    // 3. ENVÍO AL SERVIDOR (ECO)
+    $("#btnSincronizar").click(function() {
+        if (misGastos.length === 0) {
+            alert("No hay gastos para enviar.");
+            return;
+        }
+
+        $.ajax({
+            url: "https://lm.iesnervion.es/eco.php",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(misGastos),
+            success: function(respuesta) {
+                console.log("Respuesta Eco:", respuesta);
+                alert("¡Informe enviado! El servidor ha procesado " + misGastos.length + " gastos.");
+            },
+            error: function() {
+                alert("Error de conexión. Revisa el certificado SSL del servidor.");
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

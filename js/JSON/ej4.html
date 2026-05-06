@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ejercicio 4 - Envío y Recepción JSON</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        table, th, td { border: 1px solid black; border-collapse: collapse; padding: 8px; margin-top: 10px; }
+        th { background-color: #f2f2f2; }
+        .formulario { border: 1px solid #ccc; padding: 15px; width: fit-content; margin-bottom: 20px; }
+        .formulario input { display: block; margin-bottom: 5px; }
+        .hobbies-group { margin: 10px 0; border: 1px dashed #aaa; padding: 10px; }
+        tbody tr { cursor: pointer; transition: background 0.2s; }
+        tbody tr:hover { background-color: #f0f8ff; }
+        .btn-enviar { background-color: #4CAF50; color: white; padding: 10px; margin-top: 10px; cursor: pointer; border: none; border-radius: 4px; }
+        .btn-enviar:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+
+<div class="formulario">
+    <h3>Registro de Usuarios</h3>
+    <input type="text" id="nombre" placeholder="Nombre">
+    <input type="text" id="apellidos" placeholder="Apellidos">
+    <input type="number" id="edad" placeholder="Edad">
+    <input type="text" id="ciudad" placeholder="Ciudad">
+
+    <div class="hobbies-group">
+        <strong>Hobbies (máx. 3):</strong><br>
+        <label><input type="checkbox" name="hobbies[]" value="deporte"> Deporte</label>
+        <label><input type="checkbox" name="hobbies[]" value="lectura"> Lectura</label>
+        <label><input type="checkbox" name="hobbies[]" value="música"> Música</label>
+        <label><input type="checkbox" name="hobbies[]" value="juegos"> Juegos</label>
+        <label><input type="checkbox" name="hobbies[]" value="cine"> Cine</label>
+    </div>
+
+    <button onclick="procesarFormulario()">Añadir a la lista</button>
+    <button onclick="borrarTabla()" style="background-color: #ffcccc;">Limpiar Tabla</button>
+    <hr>
+    <button class="btn-enviar" onclick="enviarAlServidor()">🚀 ENVIAR ARRAY AL SERVIDOR</button>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>Nombre</th><th>Apellidos</th><th>Edad</th><th>Ciudad</th><th>Hobbies</th>
+    </tr>
+    </thead>
+    <tbody id="cuerpoTabla"></tbody>
+</table>
+
+<div class="estadisticas">
+    <h3>Estadísticas (Cálculo Local)</h3>
+    <table>
+        <tr><th>Suma</th><th>Media</th><th>Máx</th><th>Mín</th></tr>
+        <tr><td id="valSuma">0</td><td id="valMedia">0</td><td id="valMax">0</td><td id="valMin">0</td></tr>
+    </table>
+</div>
+
+<script>
+    // --- Lógica del Reto de Hobbies (jQuery) ---
+    $(document).ready(function() {
+        $('input[name="hobbies[]"]').on('change', function() {
+            let marcados = $('input[name="hobbies[]"]:checked').length;
+            if (marcados >= 3) {
+                $('input[name="hobbies[]"]:not(:checked)').prop('disabled', true);
+            } else {
+                $('input[name="hobbies[]"]').prop('disabled', false);
+            }
+        });
+    });
+
+    // --- Funciones de utilidad ---
+    const serializar = (obj) => JSON.stringify(obj);
+    const deserializar = (json) => JSON.parse(json);
+
+    // --- NUEVA FUNCIÓN: Envío y Recepción (Ejercicio 4) ---
+    async function enviarAlServidor() {
+        // 1. Recolectamos los datos actuales de la tabla
+        const filas = document.querySelectorAll("#cuerpoTabla tr");
+        const listaActual = [];
+
+        filas.forEach(fila => {
+            listaActual.push({
+                nombre: fila.cells[0].textContent,
+                apellidos: fila.cells[1].textContent,
+                edad: parseInt(fila.cells[2].textContent),
+                ciudad: fila.cells[3].textContent,
+                hobbies: fila.cells[4].textContent
+            });
+        });
+
+        if (listaActual.length === 0) {
+            alert("La tabla está vacía. Añade al menos un registro.");
+            return;
+        }
+
+        // 2. Realizamos la prueba de envío
+        try {
+            console.log("Enviando datos...", serializar(listaActual));
+
+            const respuesta = await fetch('https://lm.iesnervion.es/eco.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: serializar(listaActual) // Usamos tu función de utilidad
+            });
+
+            if (!respuesta.ok) throw new Error("Error en la respuesta del servidor");
+
+            const datosRecibidos = await respuesta.json();
+
+            // 3. Observar la respuesta (la mostramos por consola y alert como pide el ejercicio)
+            console.log("Respuesta del servidor:", datosRecibidos);
+            alert("¡Datos enviados con éxito! Revisa la consola (F12) para ver la respuesta del servidor.");
+
+        } catch (error) {
+            console.error("Error al enviar:", error);
+            alert("Hubo un error al conectar con el servidor.");
+        }
+    }
+
+    // --- Funciones de Gestión de Tabla (Vanilla JS) ---
+    function procesarFormulario() {
+        const campos = ["nombre", "apellidos", "edad", "ciudad"];
+        for (let id of campos) {
+            if (document.getElementById(id).value.trim() === "") {
+                alert("Rellena todos los campos."); return;
+            }
+        }
+
+        const hobbies = Array.from(document.querySelectorAll('input[name="hobbies[]"]:checked')).map(cb => cb.value);
+        if (hobbies.length === 0) { alert("Elige un hobby."); return; }
+
+        const nuevo = {
+            nombre: document.getElementById("nombre").value,
+            apellidos: document.getElementById("apellidos").value,
+            edad: document.getElementById("edad").value,
+            ciudad: document.getElementById("ciudad").value,
+            hobbies: hobbies.join(", ")
+        };
+
+        insertarFila(nuevo);
+        limpiarFormulario();
+        actualizarEstadisticas();
+    }
+
+    function insertarFila(datos) {
+        const fila = document.createElement("tr");
+        fila.onclick = function() { this.remove(); actualizarEstadisticas(); };
+
+        Object.values(datos).forEach(texto => {
+            const td = document.createElement("td");
+            td.textContent = texto;
+            fila.appendChild(td);
+        });
+        document.getElementById("cuerpoTabla").appendChild(fila);
+    }
+
+    function limpiarFormulario() {
+        document.querySelectorAll(".formulario input").forEach(i => {
+            i.value = ""; i.checked = false; i.disabled = false;
+        });
+    }
+
+    function borrarTabla() {
+        document.getElementById("cuerpoTabla").innerHTML = "";
+        actualizarEstadisticas();
+    }
+
+    function actualizarEstadisticas() {
+        let edades = Array.from(document.querySelectorAll("#cuerpoTabla tr")).map(f => parseInt(f.cells[2].textContent));
+        const ids = ["valSuma", "valMedia", "valMax", "valMin"];
+
+        if (edades.length === 0) {
+            ids.forEach(id => document.getElementById(id).textContent = "0");
+            return;
+        }
+
+        let suma = 0;
+        for(let e of edades) suma += e;
+
+        document.getElementById("valSuma").textContent = suma;
+        document.getElementById("valMedia").textContent = (suma / edades.length).toFixed(2);
+        document.getElementById("valMax").textContent = Math.max(...edades);
+        document.getElementById("valMin").textContent = Math.min(...edades);
+    }
+</script>
+</body>
+</html>

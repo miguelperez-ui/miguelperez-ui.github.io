@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio 1 - Perros API</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .dog-container { max-width: 600px; margin: 50px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        #dogImage { width: 100%; height: 400px; object-fit: cover; border-radius: 10px; display: none; margin-top: 20px; border: 5px solid #eee; }
+        .loader { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="dog-container text-center">
+        <h2 class="mb-4">🐶 Buscador de Perritos</h2>
+
+        <div class="d-grid gap-3">
+            <button id="btnRandom" class="btn btn-primary btn-lg">¡Sorpréndeme! (Aleatorio)</button>
+
+            <select id="breedSelector" class="form-select form-select-lg">
+                <option value="" selected disabled>Selecciona una raza...</option>
+            </select>
+        </div>
+
+        <div id="loader" class="spinner-border text-primary mt-4 loader" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+
+        <img id="dogImage" src="" alt="Imagen de perro">
+    </div>
+</div>
+
+<script>
+    const btnRandom = document.getElementById('btnRandom');
+    const selector = document.getElementById('breedSelector');
+    const img = document.getElementById('dogImage');
+    const loader = document.getElementById('loader');
+
+    // 1. Cargar la lista de razas al iniciar
+    async function cargarRazas() {
+        try {
+            const res = await fetch('https://dog.ceo/api/breeds/list/all');
+            const data = await res.json();
+            const razas = data.message;
+
+            for (const raza in razas) {
+                if (razas[raza].length === 0) {
+                    // Solo raza
+                    const option = document.createElement('option');
+                    option.value = raza;
+                    option.textContent = raza.charAt(0).toUpperCase() + raza.slice(1);
+                    selector.appendChild(option);
+                } else {
+                    // Raza con sub-razas (nacionalidades)
+                    razas[raza].forEach(subRaza => {
+                        const option = document.createElement('option');
+                        // Guardamos la ruta combinada para el fetch posterior
+                        option.value = `${raza}/${subRaza}`;
+                        option.textContent = `${subRaza} ${raza}`.toUpperCase();
+                        selector.appendChild(option);
+                    });
+                }
+            }
+        } catch (error) {
+            console.error("Error cargando razas:", error);
+        }
+    }
+
+    // 2. Función para mostrar la imagen y gestionar el loader
+    async function mostrarImagen(url) {
+        loader.style.display = 'inline-block';
+        img.style.display = 'none';
+
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+
+            img.src = data.message;
+            img.onload = () => {
+                loader.style.display = 'none';
+                img.style.display = 'block';
+            };
+        } catch (error) {
+            alert("No se pudo cargar la imagen");
+            loader.style.display = 'none';
+        }
+    }
+
+    // 3. Evento Botón Aleatorio (Cualquier perro)
+    btnRandom.addEventListener('click', () => {
+        selector.value = ""; // Reset selector
+        mostrarImagen('https://dog.ceo/api/breeds/image/random');
+    });
+
+    // 4. Evento Selector (Raza específica)
+    selector.addEventListener('change', (e) => {
+        const ruta = e.target.value; // Puede ser "akita" o "bulldog/french"
+        mostrarImagen(`https://dog.ceo/api/breed/${ruta}/images/random`);
+    });
+
+    // Inicializar
+    cargarRazas();
+</script>
+
+</body>
+</html>

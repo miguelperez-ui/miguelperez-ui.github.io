@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicio 4 - Pokédex Básica</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f0f0f0; font-family: 'Courier New', Courier, monospace; }
+    .pokedex-card {
+      max-width: 400px;
+      margin: 50px auto;
+      background-color: #ff1c1c;
+      border: 10px solid #333;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 15px 0 #a00000;
+    }
+    .screen {
+      background-color: #98cb98; /* Color verde retro tipo GameBoy */
+      border: 5px solid #333;
+      border-radius: 10px;
+      padding: 15px;
+      min-height: 300px;
+      text-align: center;
+    }
+    #pokeImg { width: 150px; height: 150px; filter: drop-shadow(2px 2px 0px #4a6b4a); }
+    .type-badge {
+      display: inline-block;
+      background: #333;
+      color: white;
+      padding: 2px 10px;
+      border-radius: 5px;
+      margin: 2px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+    }
+    .controls { margin-top: 20px; }
+    .btn-nav { width: 48%; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="pokedex-card">
+    <div class="input-group mb-3">
+      <input type="text" id="pokeInput" class="form-control" placeholder="Nombre o ID...">
+      <button class="btn btn-dark" onclick="buscarPokemon()">Buscar</button>
+    </div>
+
+    <div class="screen">
+      <div id="content" style="display: none;">
+        <h3 id="pokeName" class="fw-bold mb-0"></h3>
+        <small id="pokeId" class="text-dark opacity-50"></small>
+        <br>
+        <img id="pokeImg" src="" alt="Pokemon">
+        <div id="pokeTypes" class="mt-2"></div>
+      </div>
+      <div id="placeholder" class="mt-5">
+        <p>Introduce un nombre o número para empezar</p>
+      </div>
+      <div id="loader" class="spinner-border text-dark mt-5" style="display: none;"></div>
+    </div>
+
+    <div class="controls d-flex justify-content-between">
+      <button class="btn btn-warning fw-bold btn-nav" id="btnPrev" onclick="navegar(-1)" disabled>◀ Anterior</button>
+      <button class="btn btn-warning fw-bold btn-nav" id="btnNext" onclick="navegar(1)" disabled>Siguiente ▶</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentPokemonId = 0;
+
+  async function fetchPokemon(query) {
+    const content = document.getElementById('content');
+    const placeholder = document.getElementById('placeholder');
+    const loader = document.getElementById('loader');
+
+    // UI en estado de carga
+    loader.style.display = 'inline-block';
+    content.style.display = 'none';
+    placeholder.style.display = 'none';
+
+    try {
+      const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${query.toString().toLowerCase()}`);
+
+      if (!response.ok) throw new Error("Pokémon no encontrado");
+
+      const data = await response.json();
+
+      // Actualizar estado global
+      currentPokemonId = data.id;
+
+      // Mostrar datos
+      document.getElementById('pokeName').textContent = data.name.toUpperCase();
+      document.getElementById('pokeId').textContent = `#${data.id.toString().padStart(3, '0')}`;
+      document.getElementById('pokeImg').src = data.sprites.front_default;
+
+      // Tipos
+      const typesDiv = document.getElementById('pokeTypes');
+      typesDiv.innerHTML = "";
+      data.types.forEach(t => {
+        const span = document.createElement('span');
+        span.className = 'type-badge';
+        span.textContent = t.type.name;
+        typesDiv.appendChild(span);
+      });
+
+      content.style.display = 'block';
+      actualizarBotones();
+
+    } catch (error) {
+      placeholder.innerHTML = `<p class="text-danger">¡Error!<br>${error.message}</p>`;
+      placeholder.style.display = 'block';
+      currentPokemonId = 0;
+      actualizarBotones();
+    } finally {
+      loader.style.display = 'none';
+    }
+  }
+
+  function buscarPokemon() {
+    const input = document.getElementById('pokeInput').value.trim();
+    if (input) fetchPokemon(input);
+  }
+
+  // Lógica del Reto: Navegación
+  function navegar(paso) {
+    const nuevoId = currentPokemonId + paso;
+    if (nuevoId >= 1) {
+      fetchPokemon(nuevoId);
+    }
+  }
+
+  function actualizarBotones() {
+    document.getElementById('btnPrev').disabled = (currentPokemonId <= 1);
+    document.getElementById('btnNext').disabled = (currentPokemonId === 0);
+  }
+
+  // Permitir buscar al pulsar Enter
+  document.getElementById('pokeInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') buscarPokemon();
+  });
+</script>
+
+</body>
+</html>

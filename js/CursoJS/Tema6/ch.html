@@ -1,0 +1,736 @@
+
+chuleta_jQuery_JSON.html
+
+Página
+1
+/
+1
+100 %
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Chuleta jQuery & JSON — UA05b</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap');
+
+        :root {
+            --bg:       #0d0d12;
+            --surface:  #16141f;
+            --surface2: #1e1b2e;
+            --border:   #2a2640;
+            --accent:   #7c3aed;
+            --accent2:  #06b6d4;
+            --accent3:  #10b981;
+            --warn:     #f59e0b;
+            --danger:   #ef4444;
+            --text:     #e2e0f0;
+            --muted:    #7a7898;
+            --code-bg:  #12101a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* ── HEADER ── */
+        header {
+            background: linear-gradient(135deg, #1a0533 0%, #0d1a33 100%);
+            border-bottom: 2px solid var(--accent);
+            padding: 18px 24px 14px;
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+        }
+        header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #fff;
+        }
+        header span {
+            font-size: 11px;
+            color: var(--accent2);
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .print-btn {
+            margin-left: auto;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+        }
+        .print-btn:hover { background: #6d28d9; }
+
+        /* ── LAYOUT ── */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 14px;
+        }
+        .col2 { grid-column: span 2; }
+        .col3 { grid-column: span 3; }
+
+        /* ── CARD ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .card-head {
+            padding: 7px 12px;
+            font-family: 'Syne', sans-serif;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .card-head.purple  { background: #1e0a3c; color: #c084fc; border-bottom: 1px solid #3b1d6e; }
+        .card-head.cyan    { background: #062030; color: #67e8f9; border-bottom: 1px solid #0e4f6e; }
+        .card-head.green   { background: #052015; color: #6ee7b7; border-bottom: 1px solid #0d4a2e; }
+        .card-head.amber   { background: #1f1200; color: #fcd34d; border-bottom: 1px solid #5c3b00; }
+        .card-head.red     { background: #1f0808; color: #fca5a5; border-bottom: 1px solid #5c1515; }
+        .card-body { padding: 10px 12px; }
+
+        /* ── CODE BLOCKS ── */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 9px 11px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            overflow-x: auto;
+            white-space: pre;
+            color: #d4d0f0;
+            margin: 4px 0;
+        }
+        .kw  { color: #c084fc; font-weight: 700; }  /* keywords */
+        .fn  { color: #67e8f9; }                     /* functions */
+        .str { color: #6ee7b7; }                     /* strings */
+        .cmt { color: #5a5870; font-style: italic; } /* comments */
+        .num { color: #fcd34d; }                     /* numbers */
+        .op  { color: #f9a8d4; }                     /* operators */
+
+        /* ── TABLE STYLES ── */
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th {
+            background: var(--surface2);
+            color: var(--muted);
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 5px 8px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        td {
+            padding: 5px 8px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            background: var(--code-bg);
+            padding: 1px 5px;
+            border-radius: 3px;
+            color: #c084fc;
+            border: 1px solid var(--border);
+        }
+
+        /* ── BADGES ── */
+        .badge {
+            display: inline-block;
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-size: 10px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.5px;
+        }
+        .badge-ok     { background: #052015; color: #6ee7b7; border: 1px solid #0d4a2e; }
+        .badge-err    { background: #1f0808; color: #fca5a5; border: 1px solid #5c1515; }
+        .badge-warn   { background: #1f1200; color: #fcd34d; border: 1px solid #5c3b00; }
+        .badge-info   { background: #062030; color: #67e8f9; border: 1px solid #0e4f6e; }
+
+        /* ── FLOW ARROWS ── */
+        .flow {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 6px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+        }
+        .flow-box {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 3px 8px;
+            white-space: nowrap;
+        }
+        .flow-arrow { color: var(--accent2); font-size: 14px; }
+
+        .label {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 8px 0 3px;
+            font-weight: 600;
+        }
+        .note {
+            font-size: 11px;
+            color: var(--warn);
+            margin: 4px 0;
+            padding-left: 12px;
+            border-left: 2px solid var(--warn);
+        }
+        .tip {
+            font-size: 11px;
+            color: #6ee7b7;
+            margin: 4px 0;
+            padding-left: 12px;
+            border-left: 2px solid #10b981;
+        }
+
+        /* ── PRINT ── */
+        @media print {
+            body { background: #fff; color: #111; font-size: 10px; }
+            .print-btn { display: none; }
+            .grid { gap: 8px; padding: 8px; }
+            .card { border: 1px solid #ccc; }
+            .card-head.purple { background: #ede9fe; color: #6d28d9; border-bottom: 1px solid #c4b5fd; }
+            .card-head.cyan   { background: #ecfeff; color: #0e7490; border-bottom: 1px solid #a5f3fc; }
+            .card-head.green  { background: #ecfdf5; color: #065f46; border-bottom: 1px solid #a7f3d0; }
+            .card-head.amber  { background: #fffbeb; color: #92400e; border-bottom: 1px solid #fde68a; }
+            .card-head.red    { background: #fef2f2; color: #991b1b; border-bottom: 1px solid #fecaca; }
+            pre  { background: #f8f7ff; color: #111; border: 1px solid #ddd; font-size: 9.5px; }
+            code { background: #f1f0ff; color: #5b21b6; border-color: #ddd; }
+            th   { background: #f1f0ff; color: #555; }
+            td   { color: #111; }
+            .flow-box { background: #f1f0ff; border-color: #ccc; }
+            .kw  { color: #6d28d9; }
+            .fn  { color: #0e7490; }
+            .str { color: #065f46; }
+            .num { color: #92400e; }
+            .cmt { color: #999; }
+            .note { color: #92400e; }
+            .tip  { color: #065f46; }
+            header { background: #ede9fe; border-bottom: 2px solid #7c3aed; }
+            header h1 { color: #111; }
+            header span { color: #6d28d9; }
+            .badge-ok   { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
+            .badge-err  { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+            .badge-warn { background: #fffbeb; color: #92400e; border-color: #fde68a; }
+            .badge-info { background: #ecfeff; color: #0e7490; border-color: #a5f3fc; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🎯 Chuleta jQuery &amp; JSON</h1>
+    <span>UA05b · DAM</span>
+    <button class="print-btn" onclick="window.print()">🖨 Imprimir</button>
+</header>
+
+<div class="grid">
+
+    <!-- ── JSON ── -->
+    <div class="card">
+        <div class="card-head purple">📦 JSON — Serialización</div>
+        <div class="card-body">
+            <div class="flow">
+                <div class="flow-box" style="color:#c084fc">Objeto JS</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box" style="color:#67e8f9">stringify</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box" style="color:#6ee7b7">Texto JSON</div>
+            </div>
+            <div class="flow">
+                <div class="flow-box" style="color:#6ee7b7">Texto JSON</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box" style="color:#67e8f9">parse</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box" style="color:#c084fc">Objeto JS</div>
+            </div>
+            <pre><span class="cmt">// Serializar (objeto → cadena)</span>
+<span class="kw">const</span> json <span class="op">=</span> JSON.<span class="fn">stringify</span>(miObjeto);
+
+<span class="cmt">// Deserializar (cadena → objeto)</span>
+<span class="kw">const</span> obj <span class="op">=</span> JSON.<span class="fn">parse</span>(json);
+
+<span class="cmt">// Con indentación (para mostrar)</span>
+JSON.<span class="fn">stringify</span>(obj, <span class="kw">null</span>, <span class="num">2</span>);</pre>
+            <div class="note">⚠ Solo admite: String, Number, Object, Array, Boolean, null</div>
+            <div class="note">⚠ ❌ No admite: undefined, funciones, Date</div>
+        </div>
+    </div>
+
+    <!-- ── CÓDIGOS HTTP ── -->
+    <div class="card">
+        <div class="card-head amber">🌐 Códigos de Estado HTTP</div>
+        <div class="card-body">
+            <table>
+                <thead><tr><th>Código</th><th>Nombre</th><th>Cuándo</th></tr></thead>
+                <tbody>
+                <tr><td><span class="badge badge-ok">200</span></td><td>OK</td><td>GET exitoso</td></tr>
+                <tr><td><span class="badge badge-ok">201</span></td><td>Created</td><td>POST inserció</td></tr>
+                <tr><td><span class="badge badge-info">304</span></td><td>Not Modified</td><td>Usa caché</td></tr>
+                <tr><td><span class="badge badge-warn">400</span></td><td>Bad Request</td><td>JSON mal formado</td></tr>
+                <tr><td><span class="badge badge-warn">401</span></td><td>Unauthorized</td><td>Sin login</td></tr>
+                <tr><td><span class="badge badge-warn">403</span></td><td>Forbidden</td><td>Sin permiso</td></tr>
+                <tr><td><span class="badge badge-warn">404</span></td><td>Not Found</td><td>URL no existe</td></tr>
+                <tr><td><span class="badge badge-warn">429</span></td><td>Too Many Req.</td><td>Rate limit</td></tr>
+                <tr><td><span class="badge badge-err">500</span></td><td>Server Error</td><td>Fallo servidor</td></tr>
+                <tr><td><span class="badge badge-err">503</span></td><td>Unavailable</td><td>Mantenimiento</td></tr>
+                </tbody>
+            </table>
+            <div class="note">XHR: status==200 (GET) / status==201 (POST)</div>
+        </div>
+    </div>
+
+    <!-- ── DOM jQuery vs JS ── -->
+    <div class="card">
+        <div class="card-head cyan">⚡ jQuery vs DOM Nativo</div>
+        <div class="card-body">
+            <table>
+                <thead><tr><th>Acción</th><th>jQuery</th><th>JS Nativo</th></tr></thead>
+                <tbody>
+                <tr>
+                    <td>Crear</td>
+                    <td><code>$('&lt;tr&gt;')</code></td>
+                    <td><code>document.createElement('tr')</code></td>
+                </tr>
+                <tr>
+                    <td>Leer input</td>
+                    <td><code>$('#id').val()</code></td>
+                    <td><code>el.value</code></td>
+                </tr>
+                <tr>
+                    <td>Texto plano</td>
+                    <td><code>.text('Hola')</code></td>
+                    <td><code>el.textContent='Hola'</code></td>
+                </tr>
+                <tr>
+                    <td>HTML</td>
+                    <td><code>.html('&lt;b&gt;Hi&lt;/b&gt;')</code></td>
+                    <td><code>el.innerHTML='&lt;b&gt;Hi&lt;/b&gt;'</code></td>
+                </tr>
+                <tr>
+                    <td>Añadir al final</td>
+                    <td><code>$('#x').append(el)</code></td>
+                    <td><code>x.appendChild(el)</code></td>
+                </tr>
+                <tr>
+                    <td>Al principio</td>
+                    <td><code>$('#x').prepend(el)</code></td>
+                    <td><code>x.prepend(el)</code></td>
+                </tr>
+                <tr>
+                    <td>Antes</td>
+                    <td><code>$('#x').before(el)</code></td>
+                    <td><code>x.before(el)</code></td>
+                </tr>
+                <tr>
+                    <td>Después</td>
+                    <td><code>$('#x').after(el)</code></td>
+                    <td><code>x.after(el)</code></td>
+                </tr>
+                <tr>
+                    <td>Eliminar</td>
+                    <td><code>$('#x').remove()</code></td>
+                    <td><code>el.remove()</code></td>
+                </tr>
+                <tr>
+                    <td>CSS</td>
+                    <td><code>.css('color','red')</code></td>
+                    <td><code>el.style.color='red'</code></td>
+                </tr>
+                <tr>
+                    <td>Propiedad</td>
+                    <td><code>.prop('disabled',true)</code></td>
+                    <td><code>el.disabled=true</code></td>
+                </tr>
+                <tr>
+                    <td>Atributo data</td>
+                    <td><code>.attr('data-idx')</code></td>
+                    <td><code>el.dataset.idx</code></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ── XMLHttpRequest ── -->
+    <div class="card">
+        <div class="card-head purple">📡 XMLHttpRequest (nativo)</div>
+        <div class="card-body">
+            <div class="label">GET — Recibir datos</div>
+            <pre><span class="kw">function</span> <span class="fn">solicitud</span>() {
+  <span class="kw">const</span> xhr <span class="op">=</span> <span class="kw">new</span> XMLHttpRequest();
+  xhr.<span class="fn">open</span>(<span class="str">"GET"</span>, <span class="str">"https://api.com/users"</span>);
+  xhr.responseType <span class="op">=</span> <span class="str">"json"</span>; <span class="cmt">// auto-parsea</span>
+  xhr.onload <span class="op">=</span> <span class="kw">function</span>() {
+    <span class="kw">if</span> (xhr.readyState <span class="op">==</span> <span class="num">4</span> <span class="op">&&</span> xhr.status <span class="op">==</span> <span class="num">200</span>) {
+      console.<span class="fn">log</span>(xhr.response); <span class="cmt">// objeto JS</span>
+    }
+  };
+  xhr.<span class="fn">send</span>();
+}</pre>
+            <div class="label">POST — Enviar datos</div>
+            <pre><span class="kw">function</span> <span class="fn">envio</span>(obj) {
+  <span class="kw">const</span> xhr <span class="op">=</span> <span class="kw">new</span> XMLHttpRequest();
+  xhr.<span class="fn">open</span>(<span class="str">"POST"</span>, <span class="str">"https://api.com/posts"</span>);
+  xhr.responseType <span class="op">=</span> <span class="str">"json"</span>;
+  xhr.onload <span class="op">=</span> <span class="kw">function</span>() {
+    <span class="kw">if</span> (xhr.readyState <span class="op">==</span> <span class="num">4</span> <span class="op">&&</span> xhr.status <span class="op">==</span> <span class="num">201</span>) {
+      console.<span class="fn">log</span>(xhr.response);
+    }
+  };
+  xhr.<span class="fn">send</span>(JSON.<span class="fn">stringify</span>(obj));
+}</pre>
+            <div class="label">DELETE — Eliminar</div>
+            <pre>xhr.<span class="fn">open</span>(<span class="str">"DELETE"</span>, <span class="str">"url.php?id="</span> <span class="op">+</span> id, <span class="kw">true</span>);
+xhr.<span class="fn">send</span>();</pre>
+        </div>
+    </div>
+
+    <!-- ── AJAX jQuery ── -->
+    <div class="card">
+        <div class="card-head cyan">📨 AJAX con jQuery ($.ajax)</div>
+        <div class="card-body">
+            <div class="label">GET — Recibir</div>
+            <pre>$.<span class="fn">ajax</span>({
+  url:      <span class="str">"https://api.com/users"</span>,
+  method:   <span class="str">"GET"</span>,
+  dataType: <span class="str">"json"</span>  <span class="cmt">// auto-parsea respuesta</span>
+}).<span class="fn">done</span>(response <span class="op">=></span> console.<span class="fn">log</span>(response))
+  .<span class="fn">fail</span>(err <span class="op">=></span> console.<span class="fn">log</span>(err));</pre>
+            <div class="label">POST — Enviar</div>
+            <pre>$.<span class="fn">ajax</span>({
+  url:         <span class="str">"https://api.com/posts"</span>,
+  method:      <span class="str">"POST"</span>,
+  data:        JSON.<span class="fn">stringify</span>(miObjeto),
+  contentType: <span class="str">"application/json"</span>, <span class="cmt">// lo que envío</span>
+  dataType:    <span class="str">"json"</span>             <span class="cmt">// lo que espero</span>
+}).<span class="fn">done</span>(response <span class="op">=></span> console.<span class="fn">log</span>(response))
+  .<span class="fn">fail</span>(err <span class="op">=></span> console.<span class="fn">log</span>(err));</pre>
+            <div class="label">DELETE</div>
+            <pre>$.<span class="fn">ajax</span>({
+  url:    <span class="str">"https://api.com/items?id="</span> <span class="op">+</span> id,
+  method: <span class="str">"DELETE"</span>,
+  dataType: <span class="str">"json"</span>
+}).<span class="fn">done</span>(r <span class="op">=></span> $(<span class="str">"#mensajeError"</span>)
+            .<span class="fn">css</span>(<span class="str">"color"</span>,<span class="str">"green"</span>)
+            .<span class="fn">text</span>(<span class="str">"Eliminado correctamente"</span>));</pre>
+        </div>
+    </div>
+
+    <!-- ── Métodos cortos jQuery ── -->
+    <div class="card">
+        <div class="card-head green">⚡ Métodos cortos jQuery</div>
+        <div class="card-body">
+            <div class="label">$.get — Forma corta GET</div>
+            <pre>$.<span class="fn">get</span>(<span class="str">"https://api.com/users"</span>)
+  .<span class="fn">done</span>(<span class="kw">function</span>(data) {
+    console.<span class="fn">log</span>(data);
+  })
+  .<span class="fn">fail</span>(<span class="kw">function</span>(xhr, status, error) {
+    console.<span class="fn">log</span>(<span class="str">`Error: ${xhr.status}`</span>);
+  });</pre>
+            <div class="label">$.post — Forma corta POST</div>
+            <pre>$.<span class="fn">post</span>(<span class="str">"url"</span>, JSON.<span class="fn">stringify</span>(obj),
+  <span class="kw">function</span>(response) {
+    console.<span class="fn">log</span>(response);
+  }, <span class="str">"json"</span>
+).<span class="fn">fail</span>(err <span class="op">=></span> console.<span class="fn">log</span>(err));</pre>
+            <div class="label">async/await (moderno)</div>
+            <pre><span class="kw">async function</span> <span class="fn">obtenerDatos</span>() {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> res <span class="op">=</span> <span class="kw">await</span> $.<span class="fn">ajax</span>({
+      url: <span class="str">"url"</span>, method: <span class="str">"GET"</span>
+    });
+    <span class="kw">return</span> res; <span class="cmt">// return SÍ funciona con await</span>
+  } <span class="kw">catch</span>(e) { console.<span class="fn">log</span>(e); }
+}
+<span class="fn">obtenerDatos</span>().<span class="fn">then</span>(datos <span class="op">=></span> console.<span class="fn">log</span>(datos));</pre>
+        </div>
+    </div>
+
+    <!-- ── Checkboxes jQuery ── -->
+    <div class="card">
+        <div class="card-head green">☑️ Checkboxes con jQuery</div>
+        <div class="card-body">
+            <div class="label">Leer checkboxes marcados → Array</div>
+            <pre><span class="kw">const</span> hobbies <span class="op">=</span> $(<span class="str">'input[name="hobbies[]"]'</span>)
+  .<span class="fn">filter</span>(<span class="str">':checked'</span>)
+  .<span class="fn">map</span>(<span class="kw">function</span>() {
+    <span class="kw">return</span> $(<span class="kw">this</span>).<span class="fn">val</span>();
+  })
+  .<span class="fn">get</span>(); <span class="cmt">// → Array JS nativo</span>
+
+<span class="cmt">// Resultado: ["Deporte","Cine"]</span></pre>
+            <div class="label">Limitar a máximo 3 (RETO)</div>
+            <pre>$(<span class="str">'input:checkbox'</span>).<span class="fn">on</span>(<span class="str">'change'</span>, <span class="kw">function</span>() {
+  <span class="kw">const</span> n <span class="op">=</span> $(<span class="str">'input:checkbox'</span>)
+              .<span class="fn">filter</span>(<span class="str">':checked'</span>).length;
+  <span class="kw">if</span> (n <span class="op">>=</span> <span class="num">3</span>) {
+    <span class="cmt">// Deshabilita los NO marcados</span>
+    $(<span class="str">'input:checkbox'</span>)
+      .<span class="fn">not</span>(<span class="str">':checked'</span>)
+      .<span class="fn">prop</span>(<span class="str">'disabled'</span>, <span class="kw">true</span>);
+  } <span class="kw">else</span> {
+    <span class="cmt">// Habilita todos de nuevo</span>
+    $(<span class="str">'input:checkbox'</span>).<span class="fn">prop</span>(<span class="str">'disabled'</span>, <span class="kw">false</span>);
+  }
+});</pre>
+            <div class="label">Desmarcar y habilitar todos</div>
+            <pre>$(<span class="str">'input[name="hobbies[]"]'</span>)
+  .<span class="fn">prop</span>(<span class="str">'checked'</span>, <span class="kw">false</span>)
+  .<span class="fn">prop</span>(<span class="str">'disabled'</span>, <span class="kw">false</span>);</pre>
+        </div>
+    </div>
+
+    <!-- ── Array + generaTabla ── -->
+    <div class="card col2">
+        <div class="card-head purple">📋 Patrón: Array + generaTabla + splice</div>
+        <div class="card-body">
+      <pre><span class="cmt">// 1. Array global (base de datos local)</span>
+<span class="kw">let</span> lista <span class="op">=</span> [];
+<span class="kw">let</span> contadorId <span class="op">=</span> <span class="num">0</span>;
+
+<span class="cmt">// 2. Insertar en array y regenerar tabla</span>
+<span class="kw">function</span> <span class="fn">insertar</span>(obj) {
+  lista.<span class="fn">push</span>(obj);          <span class="cmt">// Añade al final del array</span>
+  <span class="fn">generaTabla</span>(lista);       <span class="cmt">// Reconstruye toda la tabla</span>
+}
+
+<span class="cmt">// 3. Reconstruir tabla desde el array</span>
+<span class="kw">function</span> <span class="fn">generaTabla</span>(lista) {
+  $(<span class="str">"#tbody"</span>).<span class="fn">html</span>(<span class="str">""</span>);    <span class="cmt">// Vaciamos primero</span>
+  lista.<span class="fn">forEach</span>(<span class="kw">function</span>(obj, indice) {
+    $(<span class="str">"#tbody"</span>).<span class="fn">append</span>(<span class="fn">generaTr</span>(obj, indice));
+  });
+}
+
+<span class="cmt">// 4. Generar TR con índice guardado en data-indice</span>
+<span class="kw">function</span> <span class="fn">generaTr</span>(obj, indice) {
+  <span class="kw">return</span> <span class="str">`&lt;tr id="fila-${obj.id}" data-indice="${indice}"
+         onclick="eliminarFila(this)"&gt;
+    &lt;td&gt;${obj.nombre}&lt;/td&gt;
+    &lt;td&gt;${obj.apellidos}&lt;/td&gt;
+    &lt;td&gt;${obj.edad}&lt;/td&gt;
+    &lt;td&gt;${obj.ciudad}&lt;/td&gt;
+  &lt;/tr&gt;`</span>;
+}
+
+<span class="cmt">// 5. Eliminar del array (splice) y regenerar</span>
+<span class="kw">function</span> <span class="fn">eliminarFila</span>(tr) {
+  <span class="kw">const</span> indice <span class="op">=</span> parseInt($(tr).<span class="fn">attr</span>(<span class="str">"data-indice"</span>));
+  lista.<span class="fn">splice</span>(indice, <span class="num">1</span>); <span class="cmt">// splice(pos, cantidad)</span>
+  <span class="fn">generaTabla</span>(lista);      <span class="cmt">// Índices recalculados ✅</span>
+}</pre>
+            <div class="tip">✅ Regenerar siempre tras splice porque los índices del array cambian.</div>
+        </div>
+    </div>
+
+    <!-- ── Errores JSON ── -->
+    <div class="card">
+        <div class="card-head red">🐛 Los 3 errores del JSON</div>
+        <div class="card-body">
+            <div class="label">JSON inválido — Ejemplos de errores</div>
+            <table>
+                <thead><tr><th>Error</th><th>Incorrecto</th><th>Correcto</th></tr></thead>
+                <tbody>
+                <tr>
+                    <td>Clave sin comillas</td>
+                    <td><code>{ nombre: "Ana" }</code></td>
+                    <td><code>{ "nombre": "Ana" }</code></td>
+                </tr>
+                <tr>
+                    <td>Comillas simples</td>
+                    <td><code>{ "x": 'hola' }</code></td>
+                    <td><code>{ "x": "hola" }</code></td>
+                </tr>
+                <tr>
+                    <td>Coma final</td>
+                    <td><code>{ "x": 1, }</code></td>
+                    <td><code>{ "x": 1 }</code></td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="label">Try-catch para capturar errores</div>
+            <pre><span class="kw">try</span> {
+  <span class="kw">const</span> datos <span class="op">=</span> JSON.<span class="fn">parse</span>(texto);
+  console.<span class="fn">log</span>(datos);
+} <span class="kw">catch</span>(error) {
+  console.<span class="fn">error</span>(<span class="str">"Error JSON:"</span>, error.message);
+}</pre>
+        </div>
+    </div>
+
+    <!-- ── Estadísticas JS ── -->
+    <div class="card">
+        <div class="card-head green">📊 Estadísticas con Arrays</div>
+        <div class="card-body">
+      <pre><span class="kw">const</span> edades <span class="op">=</span> lista.<span class="fn">map</span>(p <span class="op">=></span> p.edad);
+<span class="cmt">// .map() → extrae solo las edades</span>
+
+<span class="kw">const</span> suma  <span class="op">=</span> edades.<span class="fn">reduce</span>((acc,v) <span class="op">=></span> acc<span class="op">+</span>v, <span class="num">0</span>);
+<span class="cmt">// reduce acumula: empieza en 0</span>
+
+<span class="kw">const</span> media <span class="op">=</span> suma <span class="op">/</span> edades.length;
+
+<span class="kw">const</span> max   <span class="op">=</span> Math.<span class="fn">max</span>(<span class="op">...</span>edades);
+<span class="kw">const</span> min   <span class="op">=</span> Math.<span class="fn">min</span>(<span class="op">...</span>edades);
+<span class="cmt">// ...edades: spread para pasar array como args</span>
+
+media.<span class="fn">toFixed</span>(<span class="num">1</span>); <span class="cmt">// → "4.3" (1 decimal)</span></pre>
+            <div class="label">Array — Métodos clave</div>
+            <table>
+                <thead><tr><th>Método</th><th>Qué hace</th></tr></thead>
+                <tbody>
+                <tr><td><code>.push(x)</code></td><td>Añade x al final</td></tr>
+                <tr><td><code>.pop()</code></td><td>Elimina el último</td></tr>
+                <tr><td><code>.splice(i, n)</code></td><td>Elimina n elementos desde i</td></tr>
+                <tr><td><code>.indexOf(x)</code></td><td>Posición de x (o -1)</td></tr>
+                <tr><td><code>.forEach(fn)</code></td><td>Recorre sin devolver nada</td></tr>
+                <tr><td><code>.map(fn)</code></td><td>Recorre y devuelve nuevo array</td></tr>
+                <tr><td><code>.filter(fn)</code></td><td>Filtra según condición</td></tr>
+                <tr><td><code>.join(sep)</code></td><td>Une elementos en string</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ── Trampas y trucos ── -->
+    <div class="card">
+        <div class="card-head amber">⚠️ Trampas Comunes</div>
+        <div class="card-body">
+            <table>
+                <thead><tr><th>❌ Error</th><th>✅ Solución</th></tr></thead>
+                <tbody>
+                <tr>
+                    <td><code>&lt;button&gt;</code> recarga página</td>
+                    <td>Usar <code>type="button"</code></td>
+                </tr>
+                <tr>
+                    <td><code>edad</code> llega como string</td>
+                    <td><code>parseInt($("#edad").val())</code></td>
+                </tr>
+                <tr>
+                    <td><code>precio</code> como string</td>
+                    <td><code>parseFloat($("#precio").val())</code></td>
+                </tr>
+                <tr>
+                    <td><code>.html()</code> borra filas</td>
+                    <td>Usar <code>.append()</code> para añadir</td>
+                </tr>
+                <tr>
+                    <td>Índices tras splice</td>
+                    <td>Llamar <code>generaTabla()</code> siempre</td>
+                </tr>
+                <tr>
+                    <td><code>.attr()</code> devuelve string</td>
+                    <td>Envolver con <code>parseInt()</code></td>
+                </tr>
+                <tr>
+                    <td>No parsear JSON a mano</td>
+                    <td>Usar <code>dataType:"json"</code> en $.ajax</td>
+                </tr>
+                <tr>
+                    <td>Olvidar <code>return</code> en validación</td>
+                    <td>Tras cada <code>alert()</code>, poner <code>return;</code></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ── Snippets rápidos ── -->
+    <div class="card col3">
+        <div class="card-head purple">🚀 Snippets de Referencia Rápida</div>
+        <div class="card-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+            <div>
+                <div class="label">Validación de campos</div>
+                <pre><span class="kw">if</span> ($(<span class="str">"#nombre"</span>).<span class="fn">val</span>() <span class="op">===</span> <span class="str">""</span>) {
+  <span class="fn">alert</span>(<span class="str">"Nombre es obligatorio"</span>);
+  <span class="kw">return</span>; <span class="cmt">// ¡no olvidar!</span>
+}</pre>
+                <div class="label">Limpiar múltiples inputs</div>
+                <pre>$(<span class="str">"#a, #b, #c"</span>).<span class="fn">val</span>(<span class="str">""</span>);</pre>
+                <div class="label">Ciclo completo (simulación red)</div>
+                <pre><span class="kw">const</span> obj_ok <span class="op">=</span> JSON.<span class="fn">parse</span>(
+  JSON.<span class="fn">stringify</span>(miObjeto)
+);</pre>
+            </div>
+            <div>
+                <div class="label">onClick en TR para eliminar</div>
+                <pre><span class="cmt">// En generaTr():</span>
+<span class="str">`&lt;tr id="fila-${obj.id}"
+   data-indice="${indice}"
+   onclick="eliminarFila(this)"&gt;`</span>
+
+<span class="cmt">// La función:</span>
+<span class="kw">function</span> <span class="fn">eliminarFila</span>(tr) {
+  <span class="kw">const</span> i <span class="op">=</span> parseInt(
+    $(tr).<span class="fn">attr</span>(<span class="str">"data-indice"</span>)
+  );
+  lista.<span class="fn">splice</span>(i, <span class="num">1</span>);
+  <span class="fn">generaTabla</span>(lista);
+}</pre>
+            </div>
+            <div>
+                <div class="label">Mensaje de error/éxito</div>
+                <pre><span class="cmt">// Error en rojo</span>
+$(<span class="str">"#msg"</span>).<span class="fn">css</span>(<span class="str">"color"</span>,<span class="str">"red"</span>)
+        .<span class="fn">text</span>(respuesta.error);
+
+<span class="cmt">// Éxito en verde</span>
+$(<span class="str">"#msg"</span>).<span class="fn">css</span>(<span class="str">"color"</span>,<span class="str">"green"</span>)
+        .<span class="fn">text</span>(<span class="str">"Eliminado correctamente"</span>);</pre>
+                <div class="label">Hobbies en celda</div>
+                <pre><span class="cmt">// Array → HTML con &lt;br&gt;</span>
+obj.hobbies.<span class="fn">join</span>(<span class="str">'&lt;br&gt;'</span>)
+
+<span class="cmt">// Array → texto con comas</span>
+obj.hobbies.<span class="fn">join</span>(<span class="str">', '</span>)</pre>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /grid -->
+
+<div style="text-align:center; padding:10px; color:#3a3860; font-size:11px; font-family:'JetBrains Mono',monospace">
+    UA05b · jQuery y JSON · DAM 1º · Álvaro Vizuete Valle
+</div>
+
+</body>
+</html>
+Mostrando chuleta_jQuery_JSON.html.

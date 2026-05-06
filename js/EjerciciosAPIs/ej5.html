@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicio 5 - Tiempo Local</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-day: linear-gradient(135deg, #00b4db, #0083b0);
+      --bg-night: linear-gradient(135deg, #2c3e50, #000000);
+      --text-day: #333;
+      --text-night: #fff;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.8s ease; /* Transición suave de colores */
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Clases para el cambio de modo (Reto) */
+    body.day-mode { background: var(--bg-day); color: var(--text-day); }
+    body.night-mode { background: var(--bg-night); color: var(--text-night); }
+
+    .weather-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 30px;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    .night-mode .weather-card {
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .weather-info { display: none; }
+    .temp-display { font-size: 4rem; font-weight: bold; }
+  </style>
+</head>
+<body class="day-mode"> <div class="container d-flex justify-content-center">
+  <div class="weather-card text-center">
+    <h2 class="mb-4">🌡️ Clima Global</h2>
+
+    <div class="input-group mb-4">
+      <input type="text" id="cityInput" class="form-control" placeholder="Ciudad (ej: Madrid)">
+      <button class="btn btn-light" onclick="consultarClima()">Buscar</button>
+    </div>
+
+    <div id="loader" class="spinner-border text-light mb-3" style="display: none;"></div>
+
+    <div id="result" class="weather-info">
+      <h1 id="cityName" class="display-6 fw-bold"></h1>
+      <div class="temp-display"><span id="tempValue"></span>°C</div>
+      <p class="lead"><span id="windValue"></span> km/h de viento</p>
+      <div id="dayNightBadge" class="badge rounded-pill bg-light text-dark"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function consultarClima() {
+    const city = document.getElementById('cityInput').value.trim();
+    const loader = document.getElementById('loader');
+    const resultDiv = document.getElementById('result');
+
+    if (!city) return;
+
+    loader.style.display = 'inline-block';
+    resultDiv.style.display = 'none';
+
+    try {
+      // PETICIÓN 1: Geocodificación (Obtener latitud y longitud)
+      const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=es`);
+      const geoData = await geoRes.json();
+
+      if (!geoData.results || geoData.results.length === 0) {
+        throw new Error("No se encontró la ciudad");
+      }
+
+      const { latitude, longitude, name, country } = geoData.results[0];
+
+      // PETICIÓN 2: El Tiempo (Usando las coordenadas obtenidas)
+      const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
+      const weatherData = await weatherRes.json();
+
+      mostrarDatos(name, country, weatherData.current_weather);
+
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      loader.style.display = 'none';
+    }
+  }
+
+  function mostrarDatos(ciudad, pais, clima) {
+    document.getElementById('cityName').textContent = `${ciudad}, ${pais}`;
+    document.getElementById('tempValue').textContent = clima.temperature;
+    document.getElementById('windValue').textContent = clima.windspeed;
+
+    const isDay = clima.is_day === 1;
+
+    // Lógica del RETO: Cambio de tema día/noche
+    if (isDay) {
+      document.body.className = 'day-mode';
+      document.getElementById('dayNightBadge').textContent = '🌞 Es de día';
+    } else {
+      document.body.className = 'night-mode';
+      document.getElementById('dayNightBadge').textContent = '🌙 Es de noche';
+    }
+
+    document.getElementById('result').style.display = 'block';
+  }
+
+  // Buscar al presionar Enter
+  document.getElementById('cityInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') consultarClima();
+  });
+</script>
+
+</body>
+</html>

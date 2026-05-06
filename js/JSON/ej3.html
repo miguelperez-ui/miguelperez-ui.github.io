@@ -23,7 +23,7 @@
         <input type="text" id="apellidos" placeholder="Apellidos">
         <input type="number" id="edad" placeholder="Edad">
         <input type="text" id="ciudad" placeholder="Ciudad">
-        
+
         <div class="hobbies-group">
             <strong>Hobbies:</strong><br>
             <label><input type="checkbox" name="hobbies[]" value="deporte"> Deporte</label>
@@ -63,6 +63,7 @@
     </div>
 
     <script>
+        /*
     // Funciones de utilidad (se mantienen igual, pero son nativas de JSON)
     const serializar = (obj) => JSON.stringify(obj);
     const deserializar = (json) => JSON.parse(json);
@@ -138,7 +139,7 @@
 
     function actualizarEstadisticas() {
         let edades = [];
-        
+
         // Recorremos las filas con .each()
         $("#cuerpoTabla tr").each(function() {
             let edad = parseInt($(this).find("td").eq(2).text());
@@ -158,6 +159,125 @@
         $("#valMax").text(Math.max(...edades));
         $("#valMin").text(Math.min(...edades));
     }
+    */
+
+    // Funciones de utilidad (se mantienen igual)
+const serializar = (obj) => JSON.stringify(obj);
+const deserializar = (json) => JSON.parse(json);
+
+function procesarFormulario() {
+    const campos = [
+        { id: "nombre", etiqueta: "Nombre" },
+        { id: "apellidos", etiqueta: "Apellidos" },
+        { id: "edad", etiqueta: "Edad" },
+        { id: "ciudad", etiqueta: "Ciudad" }
+    ];
+
+    // Validación nativa
+    for (let campo of campos) {
+        const elemento = document.getElementById(campo.id);
+        if (elemento.value.trim() === "") {
+            alert(`El campo ${campo.etiqueta} es obligatorio.`);
+            return;
+        }
+    }
+
+    // Lógica de lectura de checkboxes (Array.from para manejar la NodeList)
+    const hobbiesCheckboxes = document.querySelectorAll('input[name="hobbies[]"]:checked');
+    const hobbiesSeleccionados = Array.from(hobbiesCheckboxes).map(cb => cb.value);
+
+    if (hobbiesSeleccionados.length === 0) {
+        alert("Selecciona al menos un hobby.");
+        return;
+    }
+
+    const nuevoObjeto = {
+        nombre: document.getElementById("nombre").value,
+        apellidos: document.getElementById("apellidos").value,
+        edad: document.getElementById("edad").value,
+        ciudad: document.getElementById("ciudad").value,
+        hobbies: hobbiesSeleccionados.join(", ")
+    };
+
+    insertarFila(deserializar(serializar(nuevoObjeto)));
+    limpiarFormulario();
+    actualizarEstadisticas();
+}
+
+function insertarFila(datos) {
+    const cuerpoTabla = document.getElementById("cuerpoTabla");
+
+    // Creamos la fila de forma nativa
+    const fila = document.createElement("tr");
+
+    // Evento para borrar la fila al hacer click
+    fila.addEventListener("click", function() {
+        this.remove();
+        actualizarEstadisticas();
+    });
+
+    // Insertamos las celdas (usando un array para automatizar)
+    const valores = [datos.nombre, datos.apellidos, datos.edad, datos.ciudad, datos.hobbies];
+
+    valores.forEach(texto => {
+        const celda = document.createElement("td");
+        celda.textContent = texto;
+        fila.appendChild(celda);
+    });
+
+    cuerpoTabla.appendChild(fila);
+}
+
+function limpiarFormulario() {
+    // Seleccionamos todos los inputs dentro de la clase formulario
+    const inputs = document.querySelectorAll(".formulario input");
+    inputs.forEach(input => {
+        if (input.type === "checkbox") {
+            input.checked = false;
+        } else {
+            input.value = "";
+        }
+    });
+}
+
+function borrarTabla() {
+    document.getElementById("cuerpoTabla").innerHTML = "";
+    actualizarEstadisticas();
+}
+
+function actualizarEstadisticas() {
+    const filas = document.querySelectorAll("#cuerpoTabla tr");
+    let edades = [];
+
+    filas.forEach(fila => {
+        // Obtenemos la tercera celda (índice 2)
+        const edadTexto = fila.cells[2].textContent;
+        const edad = parseInt(edadTexto);
+        if (!isNaN(edad)) edades.push(edad);
+    });
+
+    const valSuma = document.getElementById("valSuma");
+    const valMedia = document.getElementById("valMedia");
+    const valMax = document.getElementById("valMax");
+    const valMin = document.getElementById("valMin");
+
+    if (edades.length === 0) {
+        [valSuma, valMedia, valMax, valMin].forEach(el => el.textContent = "0");
+        return;
+    }
+
+    let suma = 0;
+    for (let i = 0; i < edades.length; i++) {
+    suma += edades[i];
+    }
+    const media = suma / edades.length;
+
+    valSuma.textContent = suma;
+    valMedia.textContent = media.toFixed(2);
+    valMax.textContent = Math.max(...edades);
+    valMin.textContent = Math.min(...edades);
+}
+
     </script>
 </body>
 </html>
